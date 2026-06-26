@@ -3,1237 +3,1103 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🚓 Prison Break - Escape the Police!</title>
+    <title>3D Racing Game - First Person</title>
     <style>
+        /* ─── Reset & Fullscreen ─── */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
         }
         body {
-            background: #1a1a2e;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
-        }
-        .game-wrapper {
-            background: #16213e;
-            padding: 20px 30px 30px;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-            border: 2px solid #0f3460;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 8px 12px 8px;
-            color: #e0e0e0;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .header h1 {
-            font-size: 22px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f7971e, #ffd200);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: none;
-            letter-spacing: 1px;
-        }
-        .stats {
-            display: flex;
-            gap: 20px;
-            font-size: 15px;
-            font-weight: 600;
-            background: #0a0a1a;
-            padding: 6px 18px;
-            border-radius: 40px;
-            border: 1px solid #2a3a6a;
-        }
-        .stats span {
-            color: #aaa;
-        }
-        .stats .value {
-            color: #fff;
-            min-width: 40px;
-            display: inline-block;
-            text-align: center;
-        }
-        .stats .value.police-count {
-            color: #ff6b6b;
-        }
-        .stats .value.wanted {
-            color: #ffd93d;
+            background: #111;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            cursor: none;
+            user-select: none;
         }
         canvas {
             display: block;
-            margin: 0 auto;
-            border-radius: 16px;
-            background: #2d4059;
-            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
-            width: 1000px;
-            height: 700px;
-            image-rendering: pixelated;
-            cursor: none;
         }
-        .controls {
+
+        /* ─── HUD ─── */
+        #hud {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            justify-content: space-between;
+            gap: 60px;
             align-items: center;
-            padding-top: 14px;
-            flex-wrap: wrap;
-            gap: 10px;
-            color: #aab;
-            font-size: 13px;
-        }
-        .controls kbd {
-            background: #2a2a4a;
-            padding: 3px 12px;
-            border-radius: 6px;
-            border: 1px solid #4a4a6a;
-            color: #ddd;
-            font-size: 13px;
-            font-weight: 700;
-        }
-        .btn-restart {
-            background: #e94560;
-            border: none;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            padding: 14px 40px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            z-index: 10;
             color: #fff;
-            padding: 8px 22px;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
+            font-size: 18px;
+            font-weight: 600;
             letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
         }
-        .btn-restart:hover {
-            transform: scale(1.04);
-            background: #ff6b81;
-            box-shadow: 0 6px 25px rgba(233, 69, 96, 0.5);
+        #hud .stat {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
         }
-        .btn-restart:active {
-            transform: scale(0.95);
-        }
-        .status-msg {
-            color: #ffd93d;
-            font-weight: 700;
+        #hud .stat .label {
+            font-weight: 400;
+            opacity: 0.6;
             font-size: 14px;
-            min-height: 22px;
-            text-shadow: 0 0 20px rgba(255, 217, 61, 0.2);
+            text-transform: uppercase;
         }
-        @media (max-width: 1060px) {
-            .game-wrapper {
-                padding: 12px;
-                border-radius: 16px;
+        #hud .stat .value {
+            font-size: 22px;
+            min-width: 60px;
+            text-align: center;
+        }
+        #hud .stat .value.speed {
+            color: #4fc3f7;
+        }
+        #hud .stat .value.dist {
+            color: #81c784;
+        }
+        #hud .stat .value.turbo {
+            color: #ffb74d;
+        }
+
+        /* turbo active glow */
+        #hud .stat .value.turbo.active {
+            color: #ff6f00;
+            text-shadow: 0 0 20px #ff6f00, 0 0 40px #ff6f00;
+            animation: pulse 0.3s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
             }
-            canvas {
-                width: 90vw;
-                height: calc(90vw * 0.7);
-                max-width: 1000px;
-                max-height: 700px;
+            100% {
+                transform: scale(1.15);
             }
-            .header h1 {
+        }
+
+        /* ─── Crosshair ─── */
+        #crosshair {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0.5;
+        }
+        #crosshair::before,
+        #crosshair::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+        }
+        #crosshair::before {
+            width: 2px;
+            height: 20px;
+            top: -10px;
+            left: -1px;
+        }
+        #crosshair::after {
+            width: 20px;
+            height: 2px;
+            top: -1px;
+            left: -10px;
+        }
+
+        /* ─── Instructions ─── */
+        #instructions {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-align: center;
+            pointer-events: none;
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 24px;
+            border-radius: 30px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        #instructions span {
+            display: inline-block;
+            margin: 0 12px;
+        }
+        #instructions .key {
+            color: #fff;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* ─── Ramp Indicator ─── */
+        #ramp-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 4;
+            font-size: 40px;
+            font-weight: 800;
+            color: #ffab00;
+            text-shadow: 0 0 30px rgba(255, 171, 0, 0.6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #ramp-indicator.show {
+            opacity: 1;
+            animation: rampPulse 0.6s ease-in-out infinite alternate;
+        }
+        @keyframes rampPulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 700px) {
+            #hud {
+                bottom: 20px;
+                padding: 10px 20px;
+                gap: 20px;
+                font-size: 14px;
+                flex-wrap: wrap;
+                justify-content: center;
+                border-radius: 30px;
+                width: 90%;
+            }
+            #hud .stat .value {
                 font-size: 18px;
+                min-width: 40px;
             }
-            .stats {
-                font-size: 13px;
-                padding: 4px 12px;
+            #instructions {
+                bottom: 90px;
+                font-size: 11px;
+                padding: 6px 14px;
+                width: 90%;
             }
-        }
-        @media (max-width: 600px) {
-            .header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 6px;
+            #instructions span {
+                margin: 0 6px;
             }
-            .stats {
-                justify-content: space-around;
-            }
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 8px;
-                text-align: center;
-            }
-            .btn-restart {
-                width: 100%;
+            #crosshair {
+                display: none;
             }
         }
     </style>
 </head>
 <body>
 
-    <div class="game-wrapper">
-        <div class="header">
-            <h1>🚓 PRISON BREAK</h1>
-            <div class="stats">
-                <span>⏱ <span class="value" id="timerDisplay">0</span>s</span>
-                <span>🚔 <span class="value police-count" id="policeCount">0</span></span>
-                <span>⭐ <span class="value wanted" id="wantedLevel">1</span></span>
-            </div>
+    <!-- ─── HUD ─── -->
+    <div id="hud">
+        <div class="stat">
+            <span class="label">Speed</span>
+            <span class="value speed" id="speedDisplay">0</span>
         </div>
-
-        <canvas id="gameCanvas" width="1000" height="700"></canvas>
-
-        <div class="controls">
-            <div>
-                <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or <kbd>↑</kbd> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd>
-                <span style="margin-left:12px;color:#888;">|</span>
-                <span style="margin-left:12px;color:#aaa;">Drive · Escape · Survive</span>
-            </div>
-            <div class="status-msg" id="statusMsg">🚗 Break out of prison!</div>
-            <button class="btn-restart" id="restartBtn">🔄 New Game</button>
+        <div class="stat">
+            <span class="label">Distance</span>
+            <span class="value dist" id="distDisplay">0</span>
+        </div>
+        <div class="stat">
+            <span class="label">Turbo</span>
+            <span class="value turbo" id="turboDisplay">●</span>
         </div>
     </div>
 
-    <script>
+    <!-- ─── Crosshair ─── -->
+    <div id="crosshair"></div>
+
+    <!-- ─── Ramp Indicator ─── -->
+    <div id="ramp-indicator">⬆ JUMP</div>
+
+    <!-- ─── Instructions ─── -->
+    <div id="instructions">
+        <span>🖱 <span class="key">Move</span> to steer</span>
+        <span>🖱 <span class="key">Left Click</span> = Turbo</span>
+        <span>🖱 <span class="key">Right Click</span> = Jump</span>
+    </div>
+
+    <!-- ─── Three.js ─── -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+            }
+        }
+    </script>
+
+    <script type="module">
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  GAME – Prison Break (Roblox Barry's Prison Run style)
+        //  IMPORTS
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        import * as THREE from 'three';
 
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const W = 1000,
-            H = 700;
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  DOM REFS
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const speedDisplay = document.getElementById('speedDisplay');
+        const distDisplay = document.getElementById('distDisplay');
+        const turboDisplay = document.getElementById('turboDisplay');
+        const rampIndicator = document.getElementById('ramp-indicator');
 
-        // ─── DOM refs ───
-        const timerDisplay = document.getElementById('timerDisplay');
-        const policeCountEl = document.getElementById('policeCount');
-        const wantedLevelEl = document.getElementById('wantedLevel');
-        const statusMsg = document.getElementById('statusMsg');
-        const restartBtn = document.getElementById('restartBtn');
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  THREE.JS SETUP
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a2a3a);
+        scene.fog = new THREE.Fog(0x1a2a3a, 60, 150);
 
-        // ─── Constants ───
-        const TILE = 25;
-        const COLS = 40;
-        const ROWS = 28;
+        const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 200);
+        camera.position.set(0, 2.0, 0);
 
-        // ─── Map tiles ───
-        const T = {
-            ROAD: 0,
-            BUILDING: 1,
-            POLICE: 2,
-            PRISON: 3,
-            ESCAPE: 4,
-            WALL: 5,
-            GRASS: 6,
-        };
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        document.body.prepend(renderer.domElement);
 
-        // ─── Generate map ───────────────────────────
-        function buildMap() {
-            const map = [];
-            for (let r = 0; r < ROWS; r++) {
-                map[r] = [];
-                for (let c = 0; c < COLS; c++) {
-                    // default grass
-                    map[r][c] = T.GRASS;
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  LIGHTS
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const ambientLight = new THREE.AmbientLight(0x446688, 0.4);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xffeedd, 1.8);
+        sunLight.position.set(30, 50, 20);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        sunLight.shadow.camera.near = 0.5;
+        sunLight.shadow.camera.far = 120;
+        sunLight.shadow.camera.left = -60;
+        sunLight.shadow.camera.right = 60;
+        sunLight.shadow.camera.top = 60;
+        sunLight.shadow.camera.bottom = -60;
+        scene.add(sunLight);
+
+        const fillLight = new THREE.DirectionalLight(0x88bbff, 0.3);
+        fillLight.position.set(-20, 30, -30);
+        scene.add(fillLight);
+
+        const hemiLight = new THREE.HemisphereLight(0x88ccff, 0x445533, 0.6);
+        scene.add(hemiLight);
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  ROAD PATH GENERATION
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function generatePathPoints() {
+            const pts = [];
+            const totalPoints = 180;
+            const radius = 50;
+            const heightAmp = 4;
+
+            for (let i = 0; i <= totalPoints; i++) {
+                const t = i / totalPoints;
+                const angle = t * Math.PI * 3.5;
+
+                // Spiral-ish path with curves and ramps
+                const x = Math.sin(angle) * radius * (0.6 + 0.4 * Math.sin(t * 2.3));
+                const z = t * 85 - 15;
+
+                // Height: ramps at certain intervals
+                let y = 0;
+                // Ramp 1: at t ≈ 0.2
+                const r1 = 0.18,
+                    r1w = 0.08;
+                if (t > r1 - r1w && t < r1 + r1w) {
+                    const p = (t - (r1 - r1w)) / (2 * r1w);
+                    y = heightAmp * Math.sin(p * Math.PI);
                 }
-            }
-
-            // road grid: every 3rd row/col (with 2-cell wide roads)
-            for (let r = 0; r < ROWS; r++) {
-                for (let c = 0; c < COLS; c++) {
-                    const isHorizRoad = (r % 4 === 0 || r % 4 === 1);
-                    const isVertRoad = (c % 4 === 0 || c % 4 === 1);
-                    if (isHorizRoad || isVertRoad) {
-                        map[r][c] = T.ROAD;
-                    }
+                // Ramp 2: at t ≈ 0.5
+                const r2 = 0.48,
+                    r2w = 0.08;
+                if (t > r2 - r2w && t < r2 + r2w) {
+                    const p = (t - (r2 - r2w)) / (2 * r2w);
+                    y = heightAmp * 0.7 * Math.sin(p * Math.PI);
                 }
-            }
-
-            // ── Police station with prison cell ──
-            // Define prison cell: rows 2-4, cols 30-32 (3x3)
-            const psR = 2,
-                psC = 30;
-            // Outer walls of police station (larger building)
-            for (let r = psR - 1; r < psR + 4; r++) {
-                for (let c = psC - 1; c < psC + 4; c++) {
-                    if (r < ROWS && c < COLS) {
-                        if (r === psR - 1 || r === psR + 3 || c === psC - 1 || c === psC + 3) {
-                            map[r][c] = T.WALL;
-                        }
-                    }
+                // Ramp 3: at t ≈ 0.78
+                const r3 = 0.76,
+                    r3w = 0.07;
+                if (t > r3 - r3w && t < r3 + r3w) {
+                    const p = (t - (r3 - r3w)) / (2 * r3w);
+                    y = heightAmp * 0.9 * Math.sin(p * Math.PI);
                 }
-            }
-            // Interior police station tiles (road)
-            for (let r = psR; r < psR + 3; r++) {
-                for (let c = psC; c < psC + 3; c++) {
-                    if (r < ROWS && c < COLS) {
-                        if (r === psR && c === psC) {
-                            // This is the prison cell interior
-                            map[r][c] = T.PRISON;
-                        } else {
-                            map[r][c] = T.POLICE; // police interior
-                        }
-                    }
+                // Ramp 4: at t ≈ 0.95
+                const r4 = 0.93,
+                    r4w = 0.06;
+                if (t > r4 - r4w && t < r4 + r4w) {
+                    const p = (t - (r4 - r4w)) / (2 * r4w);
+                    y = heightAmp * 0.5 * Math.sin(p * Math.PI);
                 }
+
+                pts.push(new THREE.Vector3(x, y, z));
             }
-            // Prison cell walls (bars)
-            // left wall at (psR, psC) is already PRISON, we keep it as interior.
-            // We want walls around the cell: top, bottom, right, and left except the door.
-            // The cell is at (psR, psC) -> that's the only PRISON tile.
-            // We'll create walls around it: (psR-1, psC) top, (psR+1, psC) bottom? But we only have 3x3 area.
-            // Better: cell at (psR, psC) is interior; we set its neighbors as walls.
-            // The cell is at row psR, col psC (2,30). We'll set walls at (psR, psC+1) right, (psR, psC-1) left? But left is outside.
-            // Actually let's define the cell at (psR+1, psC) maybe? Let's simplify: cell at (psR, psC) = PRISON, and we set walls at (psR, psC+1) and (psR+1, psC) and (psR, psC-1) and (psR-1, psC) but we need a door.
-            // For simplicity, we'll set the cell at (psR+1, psC) as PRISON, and place walls around it, with a door at (psR+1, psC+1) or something.
-            // Let's redo: we'll define a 2x2 prison cell: rows 2-3, cols 30-31. We'll put PRISON at (2,30) and (2,31)? No.
-            // I'll just do a simple cell: at (2,30) is PRISON, and we put walls around it except one opening.
-            // But we need to ensure the player can get out. We'll set walls around the cell: (1,30), (3,30), (2,29), (2,31) are walls, but we set (3,30) as ROAD (door) maybe.
-            // Actually we can just use the existing setup but ensure there is a PRISON tile that is not overwritten.
-            // I'll reset the police station area and build a clear prison cell.
-            // Let's overwrite the whole police station area with a clean design.
-            // We'll keep the outer walls, interior police tiles, and a prison cell with a door.
-
-            // Clear the area first (reset to road)
-            for (let r = psR - 1; r < psR + 4; r++) {
-                for (let c = psC - 1; c < psC + 4; c++) {
-                    if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
-                        map[r][c] = T.ROAD; // base
-                    }
-                }
-            }
-
-            // Outer walls
-            for (let r = psR - 1; r < psR + 4; r++) {
-                for (let c = psC - 1; c < psC + 4; c++) {
-                    if (r < ROWS && c < COLS) {
-                        if (r === psR - 1 || r === psR + 3 || c === psC - 1 || c === psC + 3) {
-                            map[r][c] = T.WALL;
-                        }
-                    }
-                }
-            }
-
-            // Interior: police station floor (POLICE tiles)
-            for (let r = psR; r < psR + 3; r++) {
-                for (let c = psC; c < psC + 3; c++) {
-                    if (r < ROWS && c < COLS) {
-                        if (!(r === psR && c === psC)) { // exclude the cell
-                            map[r][c] = T.POLICE;
-                        }
-                    }
-                }
-            }
-
-            // Prison cell: at (psR, psC) = PRISON
-            map[psR][psC] = T.PRISON;
-
-            // Walls around the cell (except door at bottom)
-            // Top wall: (psR-1, psC) is already outer wall, fine.
-            // Left wall: (psR, psC-1) is outer wall.
-            // Right wall: (psR, psC+1) is interior police, we want to make it a wall
-            map[psR][psC + 1] = T.WALL;
-            // Bottom wall: (psR+1, psC) we want to be a door -> ROAD
-            map[psR + 1][psC] = T.ROAD; // door
-            // Also make (psR+1, psC) not police, but road.
-
-            // Also ensure the cell's left and right are walls, but left is already outer, right we set.
-            // We also need to make sure the cell's top is wall (outer) and bottom is door.
-
-            // Now the cell is at (2,30) with walls on top, left, right and door at bottom (3,30).
-            // The player will spawn at (2,30) which is PRISON.
-
-            // ── Escape zone (bottom-left) ──
-            for (let r = ROWS - 5; r < ROWS - 2; r++) {
-                for (let c = 2; c < 6; c++) {
-                    if (r < ROWS && c < COLS) {
-                        map[r][c] = T.ESCAPE;
-                    }
-                }
-            }
-
-            // ── Some buildings for decoration ──
-            const buildings = [
-                [3, 6, 3, 4],
-                [3, 12, 3, 4],
-                [3, 18, 3, 4],
-                [3, 24, 3, 4],
-                [7, 6, 3, 4],
-                [7, 12, 3, 4],
-                [7, 18, 3, 4],
-                [7, 24, 3, 4],
-                [11, 6, 3, 4],
-                [11, 12, 3, 4],
-                [11, 18, 3, 4],
-                [11, 24, 3, 4],
-                [15, 6, 3, 4],
-                [15, 12, 3, 4],
-                [15, 18, 3, 4],
-                [15, 24, 3, 4],
-                [19, 6, 3, 4],
-                [19, 12, 3, 4],
-                [19, 18, 3, 4],
-                [19, 24, 3, 4],
-                [23, 6, 3, 4],
-                [23, 12, 3, 4],
-                [23, 18, 3, 4],
-                [23, 24, 3, 4],
-                [3, 34, 3, 4],
-                [7, 34, 3, 4],
-                [11, 34, 3, 4],
-                [15, 34, 3, 4],
-                [19, 34, 3, 4],
-                [23, 34, 3, 4],
-                [24, 10, 3, 4],
-                [24, 16, 3, 4],
-                [24, 22, 3, 4],
-                [24, 28, 3, 4],
-                [24, 34, 3, 4],
-            ];
-            for (const [br, bc, bh, bw] of buildings) {
-                for (let r = br; r < br + bh; r++) {
-                    for (let c = bc; c < bc + bw; c++) {
-                        if (r < ROWS && c < COLS && map[r][c] === T.GRASS) {
-                            map[r][c] = T.BUILDING;
-                        }
-                    }
-                }
-            }
-
-            // make sure escape zone is not overwritten
-            for (let r = ROWS - 5; r < ROWS - 2; r++) {
-                for (let c = 2; c < 6; c++) {
-                    if (r < ROWS && c < COLS) {
-                        map[r][c] = T.ESCAPE;
-                    }
-                }
-            }
-
-            return map;
+            return pts;
         }
 
-        let map = buildMap();
+        const pathPoints = generatePathPoints();
+        const curve = new THREE.CatmullRomCurve3(pathPoints);
 
-        // ─── Helper: tile center ───
-        function tileCenter(col, row) {
-            return { x: col * TILE + TILE / 2, y: row * TILE + TILE / 2 };
-        }
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  BUILD ROAD MESH
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const ROAD_WIDTH = 5.0;
+        const ROAD_SEGMENTS = 800;
 
-        // ─── Find start position (prison) ───
-        function findStart() {
-            for (let r = 0; r < ROWS; r++) {
-                for (let c = 0; c < COLS; c++) {
-                    if (map[r][c] === T.PRISON) {
-                        return tileCenter(c, r);
-                    }
+        function buildRoad() {
+            const positions = [];
+            const normals = [];
+            const uvs = [];
+            const indices = [];
+
+            for (let i = 0; i <= ROAD_SEGMENTS; i++) {
+                const t = i / ROAD_SEGMENTS;
+                const pt = curve.getPointAt(t);
+                const tan = curve.getTangentAt(t);
+                const up = new THREE.Vector3(0, 1, 0);
+                const bin = new THREE.Vector3().crossVectors(tan, up).normalize();
+                // if bin is near zero, use a fallback
+                if (bin.length() < 0.001) {
+                    const altUp = new THREE.Vector3(1, 0, 0);
+                    bin.crossVectors(tan, altUp).normalize();
                 }
-            }
-            // fallback
-            return { x: 200, y: 200 };
-        }
+                const right = bin.clone().normalize();
 
-        // ─── Find escape zone center ───
-        function findEscape() {
-            for (let r = 0; r < ROWS; r++) {
-                for (let c = 0; c < COLS; c++) {
-                    if (map[r][c] === T.ESCAPE) {
-                        return tileCenter(c, r);
-                    }
-                }
-            }
-            return { x: 100, y: 600 };
-        }
+                const leftPt = pt.clone().add(right.clone().multiplyScalar(-ROAD_WIDTH / 2));
+                const rightPt = pt.clone().add(right.clone().multiplyScalar(ROAD_WIDTH / 2));
 
-        // ─── Game state ─────────────────────────────
-        const startPos = findStart();
-        const escapePos = findEscape();
+                // slightly raise road surface for better shadow
+                const yOff = 0.05;
+                positions.push(leftPt.x, leftPt.y + yOff, leftPt.z);
+                positions.push(rightPt.x, rightPt.y + yOff, rightPt.z);
 
-        let player = {
-            x: startPos.x,
-            y: startPos.y,
-            angle: 0,
-            speed: 0,
-            maxSpeed: 3.8,
-            accel: 0.12,
-            brake: 0.08,
-            friction: 0.97,
-            turnSpeed: 0.045,
-            radius: 10,
-            width: 16,
-            height: 10,
-            escaped: false,
-            caught: false,
-            won: false,
-            inPrison: true,
-        };
+                const n = new THREE.Vector3(0, 1, 0);
+                normals.push(n.x, n.y, n.z);
+                normals.push(n.x, n.y, n.z);
 
-        let police = [];
-        let gameTime = 0;
-        let score = 0;
-        let wantedLevel = 1;
-        let gameOver = false;
-        let win = false;
-        let frameCount = 0;
-        let policeSpawnTimer = 0;
-        const MAX_POLICE = 12;
-        let keys = {};
+                uvs.push(0, t);
+                uvs.push(1, t);
 
-        // ─── Police class ────────────────────────────
-        class PoliceCar {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.angle = Math.random() * Math.PI * 2;
-                this.speed = 0;
-                this.maxSpeed = 1.8 + Math.random() * 0.8;
-                this.accel = 0.06;
-                this.turnSpeed = 0.035;
-                this.radius = 12;
-                this.width = 18;
-                this.height = 11;
-                this.state = 'chase'; // 'chase' | 'patrol'
-                this.patrolTarget = { x: Math.random() * W, y: Math.random() * H };
-                this.updatePatrolTarget();
-                this.stuckTimer = 0;
-                this.id = Math.random().toString(36).substr(2, 6);
-            }
-
-            updatePatrolTarget() {
-                this.patrolTarget = {
-                    x: 50 + Math.random() * (W - 100),
-                    y: 50 + Math.random() * (H - 100)
-                };
-            }
-
-            update(p, mapData) {
-                const dx = p.x - this.x;
-                const dy = p.y - this.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                // switch state based on distance
-                if (dist < 350) {
-                    this.state = 'chase';
-                } else if (dist > 500) {
-                    this.state = 'patrol';
-                }
-
-                let targetAngle = this.angle;
-
-                if (this.state === 'chase') {
-                    // chase the player with some randomness
-                    const noise = (Math.random() - 0.5) * 0.3;
-                    targetAngle = Math.atan2(dy, dx) + noise;
-                    // if too close, back off slightly
-                    if (dist < 50) {
-                        targetAngle = Math.atan2(-dy, -dx) + (Math.random() - 0.5) * 0.5;
-                    }
-                    // speed up when chasing
-                    this.maxSpeed = 1.8 + Math.random() * 0.6 + (wantedLevel - 1) * 0.15;
-                } else {
-                    // patrol
-                    const pdx = this.patrolTarget.x - this.x;
-                    const pdy = this.patrolTarget.y - this.y;
-                    const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
-                    if (pdist < 30) {
-                        this.updatePatrolTarget();
-                    }
-                    targetAngle = Math.atan2(pdy, pdx);
-                    this.maxSpeed = 1.2;
-                }
-
-                // smooth turning
-                let angleDiff = targetAngle - this.angle;
-                while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
-                while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-                const maxTurn = this.turnSpeed * 1.5;
-                if (angleDiff > maxTurn) angleDiff = maxTurn;
-                if (angleDiff < -maxTurn) angleDiff = -maxTurn;
-                this.angle += angleDiff;
-
-                // move forward
-                this.speed += this.accel;
-                if (this.speed > this.maxSpeed) this.speed = this.maxSpeed;
-
-                const moveX = Math.cos(this.angle) * this.speed;
-                const moveY = Math.sin(this.angle) * this.speed;
-                const newX = this.x + moveX;
-                const newY = this.y + moveY;
-
-                // collision with walls/buildings
-                if (!isColliding(newX, newY, this.radius, mapData)) {
-                    this.x = newX;
-                    this.y = newY;
-                } else {
-                    // try sliding
-                    if (!isColliding(newX, this.y, this.radius, mapData)) {
-                        this.x = newX;
-                    } else if (!isColliding(this.x, newY, this.radius, mapData)) {
-                        this.y = newY;
-                    } else {
-                        this.speed *= 0.5;
-                    }
-                }
-
-                // keep in bounds
-                this.x = Math.max(this.radius, Math.min(W - this.radius, this.x));
-                this.y = Math.max(this.radius, Math.min(H - this.radius, this.y));
-
-                // check if stuck
-                this.stuckTimer += 0.01;
-                if (this.stuckTimer > 60) {
-                    this.updatePatrolTarget();
-                    this.stuckTimer = 0;
-                }
-                if (this.speed < 0.3) this.stuckTimer += 0.1;
-            }
-
-            draw(ctx) {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.angle);
-
-                // body
-                const w = this.width,
-                    h = this.height;
-                const grad = ctx.createRadialGradient(0, 0, 2, 0, 0, w);
-                grad.addColorStop(0, '#4a6fa5');
-                grad.addColorStop(1, '#1a2a4a');
-                ctx.fillStyle = grad;
-                ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = 8;
-                ctx.beginPath();
-                ctx.roundRect(-w / 2, -h / 2, w, h, 3);
-                ctx.fill();
-
-                // roof light
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = '#ffd93d';
-                ctx.beginPath();
-                ctx.arc(0, -h / 2 - 2, 4, 0, Math.PI * 2);
-                ctx.fill();
-                // flashing light
-                const flash = Math.sin(frameCount * 0.08) > 0;
-                ctx.fillStyle = flash ? '#ff6b6b' : '#4a6fa5';
-                ctx.beginPath();
-                ctx.arc(0, -h / 2 - 2, 3, 0, Math.PI * 2);
-                ctx.fill();
-
-                // windshield
-                ctx.fillStyle = 'rgba(180, 220, 255, 0.3)';
-                ctx.beginPath();
-                ctx.roundRect(-w / 2 + 3, -h / 2 + 2, w - 6, 3, 1);
-                ctx.fill();
-
-                // headlights
-                ctx.fillStyle = '#ffd93d';
-                ctx.shadowBlur = 6;
-                ctx.shadowColor = '#ffd93d';
-                ctx.beginPath();
-                ctx.arc(w / 2 - 1, -h / 4, 2, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(w / 2 - 1, h / 4, 2, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-
-                ctx.restore();
-            }
-        }
-
-        // ─── roundRect polyfill for canvas ───────────
-        if (!CanvasRenderingContext2D.prototype.roundRect) {
-            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-                if (r > w / 2) r = w / 2;
-                if (r > h / 2) r = h / 2;
-                this.moveTo(x + r, y);
-                this.lineTo(x + w - r, y);
-                this.quadraticCurveTo(x + w, y, x + w, y + r);
-                this.lineTo(x + w, y + h - r);
-                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-                this.lineTo(x + r, y + h);
-                this.quadraticCurveTo(x, y + h, x, y + h - r);
-                this.lineTo(x, y + r);
-                this.quadraticCurveTo(x, y, x + r, y);
-                return this;
-            };
-        }
-
-        // ─── Collision detection ─────────────────────
-        function isColliding(x, y, radius, mapData) {
-            const margin = 4;
-            const r = radius + margin;
-            const c1 = Math.floor((x - r) / TILE);
-            const c2 = Math.floor((x + r) / TILE);
-            const r1 = Math.floor((y - r) / TILE);
-            const r2 = Math.floor((y + r) / TILE);
-            for (let row = r1; row <= r2; row++) {
-                for (let col = c1; col <= c2; col++) {
-                    if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return true;
-                    const tile = mapData[row][col];
-                    if (tile === T.BUILDING || tile === T.WALL || tile === T.POLICE) {
-                        // check distance to tile center
-                        const cx = col * TILE + TILE / 2;
-                        const cy = row * TILE + TILE / 2;
-                        const dx = x - cx;
-                        const dy = y - cy;
-                        const half = TILE / 2 + radius;
-                        if (Math.abs(dx) < half && Math.abs(dy) < half) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        function isOnRoad(x, y) {
-            const col = Math.floor(x / TILE);
-            const row = Math.floor(y / TILE);
-            if (row < 0 || row >= ROWS || col < 0 || col >= COLS) return false;
-            const tile = map[row][col];
-            return tile === T.ROAD || tile === T.PRISON || tile === T.ESCAPE || tile === T.POLICE;
-        }
-
-        // ─── Spawn police ────────────────────────────
-        function spawnPolice() {
-            if (police.length >= MAX_POLICE) return;
-            // spawn near police station or at random road
-            let spawnX, spawnY;
-            const tries = 50;
-            for (let i = 0; i < tries; i++) {
-                const r = Math.floor(Math.random() * ROWS);
-                const c = Math.floor(Math.random() * COLS);
-                if (map[r][c] === T.ROAD || map[r][c] === T.POLICE) {
-                    const pos = tileCenter(c, r);
-                    // don't spawn on player
-                    const dx = pos.x - player.x;
-                    const dy = pos.y - player.y;
-                    if (Math.sqrt(dx * dx + dy * dy) > 150) {
-                        spawnX = pos.x;
-                        spawnY = pos.y;
-                        break;
-                    }
-                }
-            }
-            if (spawnX === undefined) return;
-            const p = new PoliceCar(spawnX, spawnY);
-            police.push(p);
-        }
-
-        // ─── Reset game ──────────────────────────────
-        function resetGame() {
-            map = buildMap(); // rebuild map to reset prison
-            const s = findStart();
-            player.x = s.x;
-            player.y = s.y;
-            player.angle = 0;
-            player.speed = 0;
-            player.escaped = false;
-            player.caught = false;
-            player.won = false;
-            player.inPrison = true;
-            police = [];
-            gameTime = 0;
-            score = 0;
-            wantedLevel = 1;
-            gameOver = false;
-            win = false;
-            frameCount = 0;
-            policeSpawnTimer = 0;
-            statusMsg.textContent = '🚗 Break out of prison!';
-            statusMsg.style.color = '#ffd93d';
-            // spawn initial police
-            for (let i = 0; i < 2; i++) {
-                setTimeout(() => spawnPolice(), i * 300);
-            }
-        }
-
-        // ─── Update ──────────────────────────────────
-        function update() {
-            if (gameOver || win) return;
-            frameCount++;
-            gameTime += 1 / 60;
-
-            // ── Player input ──
-            let accel = 0,
-                turn = 0;
-            if (keys['w'] || keys['arrowup']) accel = 1;
-            if (keys['s'] || keys['arrowdown']) accel = -0.6;
-            if (keys['a'] || keys['arrowleft']) turn = -1;
-            if (keys['d'] || keys['arrowright']) turn = 1;
-
-            // speed
-            if (accel > 0) {
-                player.speed += player.accel * accel;
-            } else if (accel < 0) {
-                player.speed -= player.brake * Math.abs(accel);
-            } else {
-                player.speed *= player.friction;
-            }
-            if (Math.abs(player.speed) > player.maxSpeed) {
-                player.speed = Math.sign(player.speed) * player.maxSpeed;
-            }
-            if (Math.abs(player.speed) < 0.02) player.speed = 0;
-
-            // turn
-            if (Math.abs(player.speed) > 0.1) {
-                const turnFactor = Math.min(Math.abs(player.speed) / player.maxSpeed, 1);
-                player.angle += turn * player.turnSpeed * turnFactor;
-            }
-
-            // move
-            const moveX = Math.cos(player.angle) * player.speed;
-            const moveY = Math.sin(player.angle) * player.speed;
-            const newX = player.x + moveX;
-            const newY = player.y + moveY;
-
-            // collision with buildings/walls
-            const radius = player.radius;
-            if (!isColliding(newX, newY, radius, map)) {
-                player.x = newX;
-                player.y = newY;
-            } else {
-                // slide along walls
-                if (!isColliding(newX, player.y, radius, map)) {
-                    player.x = newX;
-                } else if (!isColliding(player.x, newY, radius, map)) {
-                    player.y = newY;
-                } else {
-                    player.speed *= 0.3;
+                if (i < ROAD_SEGMENTS) {
+                    const base = i * 2;
+                    indices.push(base, base + 1, base + 2);
+                    indices.push(base + 1, base + 3, base + 2);
                 }
             }
 
-            // keep in bounds
-            player.x = Math.max(radius, Math.min(W - radius, player.x));
-            player.y = Math.max(radius, Math.min(H - radius, player.y));
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+            geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+            geo.setIndex(indices);
+            geo.computeVertexNormals();
 
-            // ── Check prison escape ──
-            const col = Math.floor(player.x / TILE);
-            const row = Math.floor(player.y / TILE);
-            if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
-                const tile = map[row][col];
-                // If player is on a ROAD tile and still in prison, and has moved away from the cell
-                if (tile === T.ROAD && player.inPrison) {
-                    // check if far enough from prison cell (the PRISON tile)
-                    const prisonTile = findStart();
-                    const distFromPrison = Math.sqrt(
-                        Math.pow(player.x - prisonTile.x, 2) +
-                        Math.pow(player.y - prisonTile.y, 2)
-                    );
-                    if (distFromPrison > 40) { // moved out of the cell
-                        player.inPrison = false;
-                        player.escaped = true;
-                        statusMsg.textContent = '🚨 You escaped! Now evade the police!';
-                        statusMsg.style.color = '#ff6b6b';
-                        wantedLevel = 1;
-                        // spawn more police
-                        for (let i = 0; i < 3; i++) {
-                            setTimeout(() => spawnPolice(), i * 500 + 300);
-                        }
-                    }
-                }
-                // check escape zone
-                if (tile === T.ESCAPE && !player.inPrison) {
-                    // check if player is in the escape zone area
-                    const ezR = ROWS - 5,
-                        ezC = 2;
-                    const distFromEscape = Math.sqrt(
-                        Math.pow(player.x - (ezC * TILE + TILE * 2), 2) +
-                        Math.pow(player.y - (ezR * TILE + TILE * 1.5), 2)
-                    );
-                    if (distFromEscape < 60) {
-                        win = true;
-                        gameOver = true;
-                        player.won = true;
-                        statusMsg.textContent = '🏆 YOU ESCAPED! FREEDOM! 🏆';
-                        statusMsg.style.color = '#4ade80';
-                        return;
-                    }
-                }
-            }
-
-            // ── Wanted level ──
-            if (!player.inPrison && !gameOver) {
-                wantedLevel = 1 + Math.floor(gameTime / 15);
-                if (wantedLevel > 5) wantedLevel = 5;
-                // more police at higher wanted levels
-                const targetPolice = Math.min(2 + wantedLevel * 2, MAX_POLICE);
-                if (police.length < targetPolice && frameCount % 60 === 0) {
-                    if (Math.random() < 0.3 + wantedLevel * 0.05) {
-                        spawnPolice();
-                    }
-                }
-            }
-
-            // ── Police AI ──
-            for (const p of police) {
-                p.update(player, map);
-            }
-
-            // remove police that are stuck or out of bounds
-            police = police.filter(p => {
-                if (p.x < -50 || p.x > W + 50 || p.y < -50 || p.y > H + 50) return false;
-                return true;
+            const mat = new THREE.MeshStandardMaterial({
+                color: 0x3a4a5a,
+                roughness: 0.8,
+                metalness: 0.1,
+                side: THREE.DoubleSide,
             });
-
-            // ── Police collision with player ──
-            for (const p of police) {
-                const dx = p.x - player.x;
-                const dy = p.y - player.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < p.radius + player.radius - 2 && !player.inPrison) {
-                    // caught!
-                    gameOver = true;
-                    player.caught = true;
-                    statusMsg.textContent = '💀 CAUGHT! The police got you!';
-                    statusMsg.style.color = '#ff1744';
-                    return;
-                }
-            }
-
-            // ── Police-police collision avoidance ──
-            for (let i = 0; i < police.length; i++) {
-                for (let j = i + 1; j < police.length; j++) {
-                    const a = police[i],
-                        b = police[j];
-                    const dx = b.x - a.x;
-                    const dy = b.y - a.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    const minDist = a.radius + b.radius;
-                    if (dist < minDist && dist > 0.01) {
-                        const push = (minDist - dist) * 0.3;
-                        const nx = dx / dist;
-                        const ny = dy / dist;
-                        a.x -= nx * push;
-                        a.y -= ny * push;
-                        b.x += nx * push;
-                        b.y += ny * push;
-                    }
-                }
-            }
-
-            // ── Timer ──
-            timerDisplay.textContent = Math.floor(gameTime);
-            policeCountEl.textContent = police.length;
-            wantedLevelEl.textContent = wantedLevel;
-
-            // ── Auto-spawn police ──
-            if (!player.inPrison && !gameOver) {
-                policeSpawnTimer++;
-                const spawnInterval = Math.max(60, 300 - wantedLevel * 30);
-                if (policeSpawnTimer > spawnInterval && police.length < MAX_POLICE) {
-                    if (Math.random() < 0.5 + wantedLevel * 0.05) {
-                        spawnPolice();
-                    }
-                    policeSpawnTimer = 0;
-                }
-            }
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.receiveShadow = true;
+            mesh.castShadow = false;
+            return mesh;
         }
 
-        // ─── Draw ────────────────────────────────────
-        function draw() {
-            ctx.clearRect(0, 0, W, H);
+        const roadMesh = buildRoad();
+        scene.add(roadMesh);
 
-            // ── Draw map ──
-            for (let r = 0; r < ROWS; r++) {
-                for (let c = 0; c < COLS; c++) {
-                    const x = c * TILE,
-                        y = r * TILE;
-                    const tile = map[r][c];
-                    switch (tile) {
-                        case T.ROAD:
-                            ctx.fillStyle = '#4a5a6a';
-                            ctx.fillRect(x, y, TILE, TILE);
-                            // road lines
-                            if ((r % 4 === 0 || r % 4 === 1) && (c % 4 === 0 || c % 4 === 1)) {
-                                ctx.fillStyle = 'rgba(255,255,200,0.08)';
-                                ctx.fillRect(x, y, TILE, TILE);
-                            }
-                            // dashed center lines
-                            if (r % 4 === 0 && c % 4 === 0) {
-                                ctx.fillStyle = 'rgba(255,255,200,0.25)';
-                                ctx.fillRect(x + TILE / 2 - 1, y, 2, TILE);
-                                ctx.fillRect(x, y + TILE / 2 - 1, TILE, 2);
-                            }
-                            break;
-                        case T.GRASS:
-                            const shade = ((r + c) % 2 === 0) ? '#3a8a4a' : '#4a9a5a';
-                            ctx.fillStyle = shade;
-                            ctx.fillRect(x, y, TILE, TILE);
-                            break;
-                        case T.BUILDING:
-                            ctx.fillStyle = '#6a5a4a';
-                            ctx.fillRect(x, y, TILE, TILE);
-                            ctx.fillStyle = '#5a4a3a';
-                            ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
-                            // window
-                            ctx.fillStyle = 'rgba(255,220,100,0.3)';
-                            ctx.fillRect(x + 4, y + 4, 6, 6);
-                            ctx.fillRect(x + TILE - 10, y + 4, 6, 6);
-                            ctx.fillRect(x + 4, y + TILE - 10, 6, 6);
-                            ctx.fillRect(x + TILE - 10, y + TILE - 10, 6, 6);
-                            break;
-                        case T.POLICE:
-                            ctx.fillStyle = '#2a4a7a';
-                            ctx.fillRect(x, y, TILE, TILE);
-                            ctx.fillStyle = '#3a6a9a';
-                            ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
-                            // police star
-                            ctx.fillStyle = '#ffd93d';
-                            ctx.font = '14px sans-serif';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('⭐', x + TILE / 2, y + TILE / 2);
-                            break;
-                        case T.WALL:
-                            ctx.fillStyle = '#4a3a3a';
-                            ctx.fillRect(x, y, TILE, TILE);
-                            ctx.fillStyle = '#3a2a2a';
-                            ctx.fillRect(x + 1, y + 1, TILE - 2, TILE - 2);
-                            // brick pattern
-                            ctx.fillStyle = 'rgba(80,60,50,0.3)';
-                            for (let br = 0; br < 3; br++) {
-                                for (let bc = 0; bc < 3; bc++) {
-                                    if ((br + bc) % 2 === 0) {
-                                        ctx.fillRect(x + 2 + bc * 7, y + 2 + br * 7, 4, 4);
-                                    }
-                                }
-                            }
-                            break;
-                        case T.PRISON:
-                            ctx.fillStyle = '#4a3a5a';
-                            ctx.fillRect(x, y, TILE, TILE);
-                            ctx.fillStyle = '#3a2a4a';
-                            ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
-                            // bars
-                            ctx.fillStyle = '#8a7a8a';
-                            for (let i = 0; i < 4; i++) {
-                                ctx.fillRect(x + 3 + i * 6, y + 2, 2, TILE - 4);
-                            }
-                            break;
-                        case T.ESCAPE:
-                            // glowing escape zone
-                            const pulse = Math.sin(frameCount * 0.03) * 0.3 + 0.7;
-                            ctx.fillStyle = `rgba(50, 220, 80, ${pulse * 0.6})`;
-                            ctx.fillRect(x, y, TILE, TILE);
-                            ctx.fillStyle = `rgba(50, 220, 80, ${pulse * 0.3})`;
-                            ctx.fillRect(x + 2, y + 2, TILE - 4, TILE - 4);
-                            ctx.fillStyle = '#4ade80';
-                            ctx.font = '16px sans-serif';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('🚁', x + TILE / 2, y + TILE / 2);
-                            break;
-                        default:
-                            ctx.fillStyle = '#3a8a4a';
-                            ctx.fillRect(x, y, TILE, TILE);
+        // ─── Road markings (center line) ───
+        function buildMarkings() {
+            const positions = [];
+            const colors = [];
+            const segments = 300;
+            const dashLen = 0.8;
+            const gapLen = 0.6;
+            const halfW = 0.12;
+
+            let totalLen = 0;
+            for (let i = 0; i < segments; i++) {
+                const t = i / segments;
+                const pt = curve.getPointAt(t);
+                const tan = curve.getTangentAt(t);
+                const up = new THREE.Vector3(0, 1, 0);
+                const bin = new THREE.Vector3().crossVectors(tan, up).normalize();
+                if (bin.length() < 0.001) {
+                    const altUp = new THREE.Vector3(1, 0, 0);
+                    bin.crossVectors(tan, altUp).normalize();
+                }
+                const right = bin.clone().normalize();
+
+                const isDash = (i % Math.floor((dashLen + gapLen) / (1 / segments))) < Math.floor(dashLen / (1 / segments));
+                if (!isDash) continue;
+
+                const c = pt.clone().add(right.clone().multiplyScalar(-halfW));
+                const d = pt.clone().add(right.clone().multiplyScalar(halfW));
+                const yOff = 0.08;
+                positions.push(c.x, c.y + yOff, c.z);
+                positions.push(d.x, d.y + yOff, d.z);
+
+                const col = [1, 1, 1];
+                colors.push(col[0], col[1], col[2]);
+                colors.push(col[0], col[1], col[2]);
+            }
+
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+            const mat = new THREE.LineBasicMaterial({
+                vertexColors: true,
+                linewidth: 1,
+            });
+            const line = new THREE.LineSegments(geo, mat);
+            return line;
+        }
+
+        scene.add(buildMarkings());
+
+        // ─── Road edges (glow strips) ───
+        function buildEdgeStrips() {
+            const group = new THREE.Group();
+            const sides = [
+                { sign: -1, color: 0xff6644 },
+                { sign: 1, color: 0x44bbff },
+            ];
+            const segments = 400;
+            for (const side of sides) {
+                const pts = [];
+                for (let i = 0; i <= segments; i++) {
+                    const t = i / segments;
+                    const pt = curve.getPointAt(t);
+                    const tan = curve.getTangentAt(t);
+                    const up = new THREE.Vector3(0, 1, 0);
+                    const bin = new THREE.Vector3().crossVectors(tan, up).normalize();
+                    if (bin.length() < 0.001) {
+                        const altUp = new THREE.Vector3(1, 0, 0);
+                        bin.crossVectors(tan, altUp).normalize();
                     }
+                    const right = bin.clone().normalize();
+                    const p = pt.clone().add(right.clone().multiplyScalar(side.sign * ROAD_WIDTH / 2));
+                    p.y += 0.08;
+                    pts.push(p);
                 }
+                const geo = new THREE.BufferGeometry().setFromPoints(pts);
+                const mat = new THREE.LineBasicMaterial({
+                    color: side.color,
+                    transparent: true,
+                    opacity: 0.3,
+                });
+                const line = new THREE.Line(geo, mat);
+                group.add(line);
             }
+            return group;
+        }
+        scene.add(buildEdgeStrips());
 
-            // ── Police station label ──
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.font = '11px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            const psCX = 30 * TILE + TILE * 1.5;
-            const psCY = 2 * TILE + TILE * 0.5;
-            ctx.fillText('🚔 POLICE STATION', psCX, psCY - 4);
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  ENVIRONMENT
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ─── Ground ───
+        const groundGeo = new THREE.PlaneGeometry(400, 200);
+        groundGeo.rotateX(-Math.PI / 2);
+        const groundMat = new THREE.MeshStandardMaterial({
+            color: 0x2d3d2d,
+            roughness: 0.9,
+            metalness: 0.0,
+        });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.position.set(0, -0.5, 40);
+        ground.receiveShadow = true;
+        scene.add(ground);
 
-            // ── Escape zone label ──
-            const ezCX = 2 * TILE + TILE * 2;
-            const ezCY = (ROWS - 5) * TILE + TILE * 0.5;
-            ctx.fillStyle = 'rgba(74, 222, 128, 0.7)';
-            ctx.font = 'bold 13px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            ctx.fillText('🏁 EXIT', ezCX, ezCY - 4);
+        // ─── Trees ───
+        function createTree(x, z) {
+            const group = new THREE.Group();
+            const trunk = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.15, 0.25, 1.8, 6),
+                new THREE.MeshStandardMaterial({ color: 0x6b4c3b, roughness: 0.9 })
+            );
+            trunk.position.y = 0.9;
+            trunk.castShadow = true;
+            group.add(trunk);
 
-            // ── Draw police ──
-            for (const p of police) {
-                p.draw(ctx);
-            }
+            const crown = new THREE.Mesh(
+                new THREE.SphereGeometry(0.9 + Math.random() * 0.5, 6, 6),
+                new THREE.MeshStandardMaterial({
+                    color: new THREE.Color().setHSL(0.28 + Math.random() * 0.06, 0.6, 0.35 + Math.random() * 0.15),
+                    roughness: 0.8,
+                })
+            );
+            crown.position.y = 2.0 + Math.random() * 0.5;
+            crown.scale.y = 0.8 + Math.random() * 0.4;
+            crown.castShadow = true;
+            group.add(crown);
 
-            // ── Draw player car ──
-            ctx.save();
-            ctx.translate(player.x, player.y);
-            ctx.rotate(player.angle);
-
-            const w = player.width,
-                h = player.height;
-
-            // shadow
-            ctx.shadowColor = 'rgba(0,0,0,0.6)';
-            ctx.shadowBlur = 16;
-
-            // car body
-            const grad = ctx.createRadialGradient(-2, -2, 2, 0, 0, w);
-            grad.addColorStop(0, '#ff6b35');
-            grad.addColorStop(0.5, '#e84510');
-            grad.addColorStop(1, '#8a2a0a');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.roundRect(-w / 2, -h / 2, w, h, 4);
-            ctx.fill();
-
-            ctx.shadowBlur = 0;
-
-            // racing stripes
-            ctx.fillStyle = 'rgba(255,255,255,0.15)';
-            ctx.fillRect(-w / 2 + 3, -h / 2 + 2, 3, h - 4);
-            ctx.fillRect(w / 2 - 6, -h / 2 + 2, 3, h - 4);
-
-            // windshield
-            ctx.fillStyle = 'rgba(150, 200, 255, 0.4)';
-            ctx.beginPath();
-            ctx.roundRect(-w / 2 + 3, -h / 2 + 1, w - 6, 3, 1);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.roundRect(-w / 2 + 3, h / 2 - 4, w - 6, 3, 1);
-            ctx.fill();
-
-            // headlights
-            ctx.fillStyle = '#ffe066';
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#ffe066';
-            ctx.beginPath();
-            ctx.arc(w / 2 - 1, -h / 3, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(w / 2 - 1, h / 3, 2.5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
-            // taillights
-            ctx.fillStyle = '#ff1744';
-            ctx.shadowBlur = 6;
-            ctx.shadowColor = '#ff1744';
-            ctx.beginPath();
-            ctx.arc(-w / 2 + 2, -h / 3, 2, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(-w / 2 + 2, h / 3, 2, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-
-            // roof light (if escaped)
-            if (player.escaped) {
-                const flash = Math.sin(frameCount * 0.12) > 0;
-                ctx.fillStyle = flash ? '#ff1744' : '#ffd93d';
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = flash ? '#ff1744' : '#ffd93d';
-                ctx.beginPath();
-                ctx.arc(0, -h / 2 - 3, 4, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-
-            ctx.restore();
-
-            // ── Speed indicator ──
-            const speedPercent = Math.abs(player.speed) / player.maxSpeed;
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.roundRect(10, H - 30, 120, 18, 9);
-            ctx.fill();
-            ctx.fillStyle = speedPercent > 0.7 ? '#4ade80' : speedPercent > 0.3 ? '#ffd93d' : '#ff6b6b';
-            ctx.roundRect(12, H - 28, Math.max(4, speedPercent * 116), 14, 7);
-            ctx.fill();
-            ctx.fillStyle = 'rgba(255,255,255,0.6)';
-            ctx.font = '9px sans-serif';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('SPEED', 16, H - 20);
-
-            // ── Game over overlay ──
-            if (gameOver) {
-                ctx.fillStyle = 'rgba(0,0,0,0.6)';
-                ctx.fillRect(0, 0, W, H);
-                ctx.fillStyle = win ? '#4ade80' : '#ff1744';
-                ctx.font = 'bold 56px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.shadowColor = 'rgba(0,0,0,0.8)';
-                ctx.shadowBlur = 20;
-                const msg = win ? '🏆 FREEDOM!' : '💀 CAUGHT!';
-                ctx.fillText(msg, W / 2, H / 2 - 20);
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = 'rgba(255,255,255,0.8)';
-                ctx.font = '22px sans-serif';
-                ctx.fillText(win ? 'You escaped the city!' : 'The police got you!', W / 2, H / 2 + 50);
-                ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                ctx.font = '16px sans-serif';
-                ctx.fillText(`Time survived: ${Math.floor(gameTime)}s  •  Wanted Level: ${wantedLevel}`, W / 2, H / 2 + 100);
-                ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                ctx.font = '14px sans-serif';
-                ctx.fillText('Press "New Game" to try again', W / 2, H / 2 + 140);
-            }
-
-            // ── Prison indicator ──
-            if (player.inPrison && !gameOver) {
-                ctx.fillStyle = 'rgba(255,200,50,0.15)';
-                ctx.fillRect(0, 0, W, H);
-                ctx.fillStyle = '#ffd93d';
-                ctx.font = 'bold 20px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
-                ctx.shadowColor = 'rgba(0,0,0,0.8)';
-                ctx.shadowBlur = 10;
-                ctx.fillText('🔒 ESCAPE THE PRISON!', W / 2, 20);
-                ctx.shadowBlur = 0;
-                // arrow to gate
-                const gateX = 30 * TILE + TILE * 1.5;
-                const gateY = (2 + 1) * TILE; // door at row 3
-                const blink = Math.sin(frameCount * 0.06) > 0;
-                if (blink) {
-                    ctx.fillStyle = 'rgba(255,215,0,0.6)';
-                    ctx.font = '28px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText('⬇', gateX, gateY + 10);
-                    ctx.fillStyle = 'rgba(255,215,0,0.3)';
-                    ctx.font = '14px sans-serif';
-                    ctx.fillText('EXIT', gateX, gateY + 40);
-                }
-            }
+            group.position.set(x, -0.2, z);
+            const scale = 0.8 + Math.random() * 0.6;
+            group.scale.set(scale, scale, scale);
+            group.rotation.y = Math.random() * Math.PI * 2;
+            return group;
         }
 
-        // ─── Game loop ──────────────────────────────
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
+        // Place trees along the road
+        const treePositions = [];
+        for (let i = 0; i < 160; i++) {
+            const t = Math.random();
+            const pt = curve.getPointAt(t);
+            const tan = curve.getTangentAt(t);
+            const up = new THREE.Vector3(0, 1, 0);
+            const bin = new THREE.Vector3().crossVectors(tan, up).normalize();
+            if (bin.length() < 0.001) {
+                const altUp = new THREE.Vector3(1, 0, 0);
+                bin.crossVectors(tan, altUp).normalize();
+            }
+            const right = bin.clone().normalize();
+            const side = Math.random() > 0.5 ? 1 : -1;
+            const dist = ROAD_WIDTH / 2 + 1.5 + Math.random() * 4;
+            const x = pt.x + right.x * side * dist + (Math.random() - 0.5) * 1.5;
+            const z = pt.z + right.z * side * dist + (Math.random() - 0.5) * 1.5;
+            treePositions.push({ x, z });
+        }
+        for (const pos of treePositions) {
+            const tree = createTree(pos.x, pos.z);
+            scene.add(tree);
         }
 
-        // ─── Event listeners ────────────────────────
-        document.addEventListener('keydown', (e) => {
-            keys[e.key.toLowerCase()] = true;
-            if (e.key === 'ArrowUp' || e.key === 'ArrowDown' ||
-                e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        // ─── Sky particles (stars) ───
+        const starsGeo = new THREE.BufferGeometry();
+        const starsCount = 800;
+        const starPos = new Float32Array(starsCount * 3);
+        for (let i = 0; i < starsCount * 3; i++) {
+            starPos[i] = (Math.random() - 0.5) * 400;
+            if (i % 3 === 1) starPos[i] = Math.random() * 80 + 10;
+        }
+        starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+        const starsMat = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.3,
+            transparent: true,
+            opacity: 0.6,
+        });
+        const stars = new THREE.Points(starsGeo, starsMat);
+        scene.add(stars);
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  PLAYER CAR (first person – we only see the hood)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const carGroup = new THREE.Group();
+
+        // Hood
+        const hoodGeo = new THREE.BoxGeometry(0.9, 0.15, 1.0);
+        const hoodMat = new THREE.MeshStandardMaterial({
+            color: 0xcc2222,
+            roughness: 0.3,
+            metalness: 0.7,
+        });
+        const hood = new THREE.Mesh(hoodGeo, hoodMat);
+        hood.position.set(0, -0.3, 0.5);
+        hood.castShadow = true;
+        carGroup.add(hood);
+
+        // Hood scoop
+        const scoopGeo = new THREE.BoxGeometry(0.3, 0.12, 0.3);
+        const scoopMat = new THREE.MeshStandardMaterial({
+            color: 0x222222,
+            roughness: 0.4,
+            metalness: 0.3,
+        });
+        const scoop = new THREE.Mesh(scoopGeo, scoopMat);
+        scoop.position.set(0, -0.15, 0.55);
+        carGroup.add(scoop);
+
+        // Windshield (reflection)
+        const glassGeo = new THREE.BoxGeometry(1.0, 0.3, 0.05);
+        const glassMat = new THREE.MeshStandardMaterial({
+            color: 0x88ccff,
+            roughness: 0.05,
+            metalness: 0.1,
+            transparent: true,
+            opacity: 0.35,
+        });
+        const glass = new THREE.Mesh(glassGeo, glassMat);
+        glass.position.set(0, 0.2, -0.45);
+        carGroup.add(glass);
+
+        // Dashboard
+        const dashGeo = new THREE.BoxGeometry(0.8, 0.08, 0.3);
+        const dashMat = new THREE.MeshStandardMaterial({
+            color: 0x1a1a1a,
+            roughness: 0.8,
+        });
+        const dash = new THREE.Mesh(dashGeo, dashMat);
+        dash.position.set(0, 0.02, -0.15);
+        carGroup.add(dash);
+
+        // Steering wheel (visible in first person)
+        const wheelGroup = new THREE.Group();
+        const rimGeo = new THREE.TorusGeometry(0.12, 0.025, 8, 16);
+        const rimMat = new THREE.MeshStandardMaterial({
+            color: 0x222222,
+            roughness: 0.5,
+            metalness: 0.2,
+        });
+        const rim = new THREE.Mesh(rimGeo, rimMat);
+        rim.rotation.x = Math.PI / 2;
+        wheelGroup.add(rim);
+
+        const hubGeo = new THREE.CircleGeometry(0.05, 8);
+        const hubMat = new THREE.MeshStandardMaterial({
+            color: 0x444444,
+            roughness: 0.3,
+            metalness: 0.5,
+        });
+        const hub = new THREE.Mesh(hubGeo, hubMat);
+        hub.rotation.x = -Math.PI / 2;
+        hub.position.z = 0.01;
+        wheelGroup.add(hub);
+
+        // Spokes
+        for (let i = 0; i < 3; i++) {
+            const spokeGeo = new THREE.BoxGeometry(0.01, 0.1, 0.01);
+            const spokeMat = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.4, roughness: 0.3 });
+            const spoke = new THREE.Mesh(spokeGeo, spokeMat);
+            spoke.rotation.z = (i / 3) * Math.PI * 2;
+            spoke.position.set(0, 0, 0);
+            wheelGroup.add(spoke);
+        }
+
+        wheelGroup.position.set(0, -0.12, -0.2);
+        wheelGroup.scale.set(1, 1, 1);
+        carGroup.add(wheelGroup);
+
+        // Side mirrors (small)
+        const mirrorMat = new THREE.MeshStandardMaterial({
+            color: 0x333333,
+            roughness: 0.2,
+            metalness: 0.6,
+        });
+        for (const side of [-1, 1]) {
+            const mirror = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.12), mirrorMat);
+            mirror.position.set(side * 0.6, 0.05, -0.1);
+            carGroup.add(mirror);
+        }
+
+        // Headlights
+        const hlMat = new THREE.MeshStandardMaterial({
+            color: 0xffffee,
+            emissive: 0xffffaa,
+            emissiveIntensity: 0.3,
+        });
+        for (const side of [-1, 1]) {
+            const hl = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 8), hlMat);
+            hl.position.set(side * 0.25, -0.1, 0.55);
+            hl.scale.set(1, 0.7, 0.4);
+            carGroup.add(hl);
+        }
+
+        // Car shadow (under the car, subtle)
+        const shadowGeo = new THREE.CircleGeometry(0.5, 16);
+        const shadowMat = new THREE.MeshStandardMaterial({
+            color: 0x000000,
+            transparent: true,
+            opacity: 0.15,
+            depthWrite: false,
+            roughness: 1,
+            metalness: 0,
+        });
+        const shadow = new THREE.Mesh(shadowGeo, shadowMat);
+        shadow.rotation.x = -Math.PI / 2;
+        shadow.position.set(0, -0.45, 0);
+        carGroup.add(shadow);
+
+        // Position the car initially
+        const startPt = curve.getPointAt(0);
+        const startTan = curve.getTangentAt(0);
+        carGroup.position.copy(startPt);
+        carGroup.position.y += 0.1;
+        // Face forward
+        const angle = Math.atan2(startTan.x, startTan.z);
+        carGroup.rotation.y = angle;
+
+        scene.add(carGroup);
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  GAME STATE
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const state = {
+            // Position along path (0..1)
+            t: 0,
+            // Lateral offset from center (-1..1)
+            steer: 0,
+            // Speed
+            speed: 8,
+            baseSpeed: 8,
+            maxSpeed: 18,
+            minSpeed: 3,
+            // Turbo
+            turboActive: false,
+            turboTimer: 0,
+            turboCooldown: 0,
+            // Jump
+            jumpActive: false,
+            jumpVelocity: 0,
+            jumpGravity: -22,
+            isGrounded: true,
+            // Ramp detection
+            onRamp: false,
+            // Distance
+            distance: 0,
+            // Mouse
+            mouseX: 0,
+            mouseY: 0,
+            // Input flags
+            leftPressed: false,
+            rightPressed: false,
+        };
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  CONTROLS
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // Mouse move → steering
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 2 - 1;
+            state.mouseX = Math.max(-1, Math.min(1, x));
+            state.steer = state.mouseX;
+        });
+
+        // Left click → Turbo
+        document.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
                 e.preventDefault();
+                state.leftPressed = true;
+                activateTurbo();
+            }
+            if (e.button === 2) {
+                e.preventDefault();
+                state.rightPressed = true;
+                activateJump();
             }
         });
-        document.addEventListener('keyup', (e) => {
-            keys[e.key.toLowerCase()] = false;
+
+        document.addEventListener('mouseup', (e) => {
+            if (e.button === 0) {
+                state.leftPressed = false;
+            }
+            if (e.button === 2) {
+                state.rightPressed = false;
+            }
         });
 
-        restartBtn.addEventListener('click', resetGame);
+        // Prevent context menu
+        document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-        // ─── Start ──────────────────────────────────
-        resetGame();
-        loop();
+        // Touch support for mobile
+        let touchId = null;
+        renderer.domElement.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.changedTouches[0];
+            if (touch) {
+                const x = (touch.clientX / window.innerWidth) * 2 - 1;
+                state.mouseX = Math.max(-1, Math.min(1, x));
+                state.steer = state.mouseX;
+                touchId = touch.identifier;
+                // Simple tap: left click = turbo, right click not available on mobile
+                activateTurbo();
+            }
+        }, { passive: false });
 
-        // ─── Handle resize ──────────────────────────
-        function handleResize() {
-            const wrapper = document.querySelector('.game-wrapper');
-            const maxW = window.innerWidth - 40;
-            const maxH = window.innerHeight - 40;
-            const wrapperW = Math.min(1060, maxW);
-            const wrapperH = Math.min(820, maxH);
-            // canvas scales via CSS
+        renderer.domElement.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            for (const touch of e.changedTouches) {
+                if (touch.identifier === touchId || touchId === null) {
+                    const x = (touch.clientX / window.innerWidth) * 2 - 1;
+                    state.mouseX = Math.max(-1, Math.min(1, x));
+                    state.steer = state.mouseX;
+                    touchId = touch.identifier;
+                }
+            }
+        }, { passive: false });
+
+        renderer.domElement.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            touchId = null;
+        }, { passive: false });
+
+        // ─── Turbo ───
+        function activateTurbo() {
+            if (state.turboCooldown > 0) return;
+            state.turboActive = true;
+            state.turboTimer = 1.2;
+            state.turboCooldown = 0.6;
+            state.speed = Math.min(state.speed + 6, state.maxSpeed + 4);
+            turboDisplay.classList.add('active');
         }
-        window.addEventListener('resize', handleResize);
-        handleResize();
 
-        console.log('🚓 Prison Break started! Drive with WASD / Arrow keys.');
-        console.log('🏁 Escape the prison, then reach the EXIT zone!');
+        // ─── Jump ───
+        function activateJump() {
+            if (!state.onRamp || !state.isGrounded) return;
+            state.jumpActive = true;
+            state.jumpVelocity = 9.0;
+            state.isGrounded = false;
+            // visual feedback
+            rampIndicator.classList.remove('show');
+            // small screen shake / effect
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  HELPER: get road data at t
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function getRoadData(t) {
+            const pt = curve.getPointAt(t);
+            const tan = curve.getTangentAt(t);
+            const up = new THREE.Vector3(0, 1, 0);
+            const bin = new THREE.Vector3().crossVectors(tan, up).normalize();
+            if (bin.length() < 0.001) {
+                const altUp = new THREE.Vector3(1, 0, 0);
+                bin.crossVectors(tan, altUp).normalize();
+            }
+            const right = bin.clone().normalize();
+            return { pt, tan, right, up };
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  RAMP DETECTION
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function checkRamp(t) {
+            // Check if current position is on a ramp by looking at height derivative
+            const eps = 0.002;
+            const t1 = Math.max(0, t - eps);
+            const t2 = Math.min(1, t + eps);
+            const p1 = curve.getPointAt(t1);
+            const p2 = curve.getPointAt(t2);
+            const dy = p2.y - p1.y;
+            const dz = p2.z - p1.z;
+            const slope = Math.abs(dy) / (Math.abs(dz) + 0.001);
+            // Also check if we're on a ramp section by looking at height
+            const height = curve.getPointAt(t).y;
+            const isRamp = height > 0.6 || slope > 0.08;
+            return isRamp;
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  GAME LOOP
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const clock = new THREE.Clock();
+
+        function update() {
+            const delta = Math.min(clock.getDelta(), 0.05);
+
+            // ── Turbo timer ──
+            if (state.turboActive) {
+                state.turboTimer -= delta;
+                if (state.turboTimer <= 0) {
+                    state.turboActive = false;
+                    state.speed = state.baseSpeed;
+                    turboDisplay.classList.remove('active');
+                }
+            }
+            if (state.turboCooldown > 0) {
+                state.turboCooldown -= delta;
+            }
+
+            // ── Speed ──
+            // Speed varies slightly with steering (slow down in turns)
+            const steerFactor = 1 - Math.abs(state.steer) * 0.25;
+            let targetSpeed = state.baseSpeed * steerFactor;
+            if (state.turboActive) {
+                targetSpeed = Math.min(state.maxSpeed + 4, targetSpeed + 8);
+            }
+            state.speed += (targetSpeed - state.speed) * delta * 2.5;
+            state.speed = Math.max(state.minSpeed, Math.min(state.maxSpeed + 4, state.speed));
+
+            // ── Steer ──
+            const steerSpeed = 3.2;
+            const targetSteer = state.mouseX;
+            state.steer += (targetSteer - state.steer) * delta * steerSpeed;
+            state.steer = Math.max(-1, Math.min(1, state.steer));
+
+            // ── Move along path ──
+            const speedFactor = state.speed / 12;
+            const dt = delta * 0.08 * speedFactor;
+            state.t += dt;
+            if (state.t > 1) {
+                state.t -= 1;
+                // loop: distance continues
+            }
+
+            // ── Ramp detection ──
+            state.onRamp = checkRamp(state.t);
+            if (state.onRamp && state.isGrounded) {
+                rampIndicator.classList.add('show');
+            } else {
+                if (!state.jumpActive) {
+                    rampIndicator.classList.remove('show');
+                }
+            }
+
+            // ── Jump physics ──
+            if (state.jumpActive) {
+                state.jumpVelocity += state.jumpGravity * delta;
+                // Check if landed
+                const roadHeight = curve.getPointAt(state.t).y;
+                const carY = carGroup.position.y;
+                if (carY + state.jumpVelocity * delta <= roadHeight + 0.1) {
+                    state.jumpVelocity = 0;
+                    state.jumpActive = false;
+                    state.isGrounded = true;
+                    carGroup.position.y = roadHeight + 0.1;
+                } else {
+                    carGroup.position.y += state.jumpVelocity * delta;
+                    state.isGrounded = false;
+                }
+            } else {
+                // Stick to road
+                const roadHeight = curve.getPointAt(state.t).y;
+                carGroup.position.y = roadHeight + 0.1;
+                state.isGrounded = true;
+            }
+
+            // ── Get road data ──
+            const data = getRoadData(state.t);
+            const { pt, tan, right } = data;
+
+            // ── Lateral offset ──
+            const maxOffset = ROAD_WIDTH / 2 - 0.5;
+            const offset = state.steer * maxOffset;
+            const lateralPos = pt.clone().add(right.clone().multiplyScalar(offset));
+
+            // ── Update car position ──
+            carGroup.position.x = lateralPos.x;
+            carGroup.position.z = lateralPos.z;
+            // y is handled by jump/road stick
+
+            // ── Car rotation ──
+            const lookTarget = pt.clone().add(tan.clone().multiplyScalar(2));
+            const dir = new THREE.Vector3().copy(lookTarget).sub(carGroup.position);
+            dir.y = 0;
+            if (dir.length() > 0.01) {
+                const targetAngle = Math.atan2(dir.x, dir.z);
+                let currentAngle = carGroup.rotation.y;
+                let diff = targetAngle - currentAngle;
+                while (diff > Math.PI) diff -= Math.PI * 2;
+                while (diff < -Math.PI) diff += Math.PI * 2;
+                carGroup.rotation.y += diff * delta * 4;
+            }
+
+            // ── Slight body roll during turns ──
+            const rollAmount = -state.steer * 0.06;
+            carGroup.rotation.z += (rollAmount - carGroup.rotation.z) * delta * 3;
+
+            // ── Slight pitch on ramps ──
+            const pitchTarget = Math.atan2(pt.y - curve.getPointAt(Math.max(0, state.t - 0.01)).y, 0.5);
+            carGroup.rotation.x += (pitchTarget * 0.3 - carGroup.rotation.x) * delta * 2;
+
+            // ── Distance ──
+            state.distance += state.speed * delta * 0.6;
+
+            // ── Camera (First Person) ──
+            const eyeHeight = 1.4;
+            const camPos = carGroup.position.clone();
+            camPos.y += eyeHeight;
+
+            // Add a subtle head bob
+            const bobAmount = state.speed > 2 ? 0.015 * Math.sin(state.distance * 0.08) : 0;
+            camPos.y += bobAmount;
+
+            // Look direction: forward from car, with slight mouse Y influence
+            const fwd = new THREE.Vector3(0, 0, -1);
+            fwd.applyQuaternion(carGroup.quaternion);
+            const lookAhead = 8;
+            const targetPos = carGroup.position.clone().add(fwd.clone().multiplyScalar(lookAhead));
+            targetPos.y += 0.2 + state.mouseY * 0.3;
+
+            camera.position.copy(camPos);
+            camera.lookAt(targetPos);
+
+            // ── Update HUD ──
+            const speedKmh = Math.round(state.speed * 8);
+            speedDisplay.textContent = speedKmh;
+            distDisplay.textContent = Math.floor(state.distance);
+
+            // Turbo indicator
+            if (state.turboActive) {
+                turboDisplay.textContent = '⚡';
+            } else if (state.turboCooldown > 0) {
+                turboDisplay.textContent = '●';
+                turboDisplay.style.opacity = '0.3';
+            } else {
+                turboDisplay.textContent = '●';
+                turboDisplay.style.opacity = '1';
+            }
+
+            // ── Stars rotation ──
+            stars.rotation.y += delta * 0.008;
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  RESIZE
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        window.addEventListener('resize', () => {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        });
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  ANIMATION LOOP
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function animate() {
+            requestAnimationFrame(animate);
+            update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  STARTUP: reset state
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        state.t = 0;
+        state.distance = 0;
+        state.speed = state.baseSpeed;
+        const startData = getRoadData(0);
+        carGroup.position.copy(startData.pt);
+        carGroup.position.y += 0.1;
+        const startAngle = Math.atan2(startData.tan.x, startData.tan.z);
+        carGroup.rotation.y = startAngle;
+
+        console.log('🏁 3D Racing Game ready!');
+        console.log('🖱 Move mouse to steer');
+        console.log('🖱 Left click = Turbo');
+        console.log('🖱 Right click = Jump (on ramps)');
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  EXPOSE FOR DEBUG (optional)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        window.__game = { scene, camera, carGroup, curve, state };
     </script>
 </body>
 </html>

@@ -248,48 +248,98 @@
                 }
             }
 
-            // ── Police station (top-right area) ──
+            // ── Police station with prison cell ──
+            // Define prison cell: rows 2-4, cols 30-32 (3x3)
             const psR = 2,
-                psC = 30,
-                psH = 6,
-                psW = 8;
-            for (let r = psR; r < psR + psH; r++) {
-                for (let c = psC; c < psC + psW; c++) {
+                psC = 30;
+            // Outer walls of police station (larger building)
+            for (let r = psR - 1; r < psR + 4; r++) {
+                for (let c = psC - 1; c < psC + 4; c++) {
                     if (r < ROWS && c < COLS) {
-                        // outer walls
-                        if (r === psR || r === psR + psH - 1 || c === psC || c === psC + psW - 1) {
+                        if (r === psR - 1 || r === psR + 3 || c === psC - 1 || c === psC + 3) {
                             map[r][c] = T.WALL;
+                        }
+                    }
+                }
+            }
+            // Interior police station tiles (road)
+            for (let r = psR; r < psR + 3; r++) {
+                for (let c = psC; c < psC + 3; c++) {
+                    if (r < ROWS && c < COLS) {
+                        if (r === psR && c === psC) {
+                            // This is the prison cell interior
+                            map[r][c] = T.PRISON;
                         } else {
+                            map[r][c] = T.POLICE; // police interior
+                        }
+                    }
+                }
+            }
+            // Prison cell walls (bars)
+            // left wall at (psR, psC) is already PRISON, we keep it as interior.
+            // We want walls around the cell: top, bottom, right, and left except the door.
+            // The cell is at (psR, psC) -> that's the only PRISON tile.
+            // We'll create walls around it: (psR-1, psC) top, (psR+1, psC) bottom? But we only have 3x3 area.
+            // Better: cell at (psR, psC) is interior; we set its neighbors as walls.
+            // The cell is at row psR, col psC (2,30). We'll set walls at (psR, psC+1) right, (psR, psC-1) left? But left is outside.
+            // Actually let's define the cell at (psR+1, psC) maybe? Let's simplify: cell at (psR, psC) = PRISON, and we set walls at (psR, psC+1) and (psR+1, psC) and (psR, psC-1) and (psR-1, psC) but we need a door.
+            // For simplicity, we'll set the cell at (psR+1, psC) as PRISON, and place walls around it, with a door at (psR+1, psC+1) or something.
+            // Let's redo: we'll define a 2x2 prison cell: rows 2-3, cols 30-31. We'll put PRISON at (2,30) and (2,31)? No.
+            // I'll just do a simple cell: at (2,30) is PRISON, and we put walls around it except one opening.
+            // But we need to ensure the player can get out. We'll set walls around the cell: (1,30), (3,30), (2,29), (2,31) are walls, but we set (3,30) as ROAD (door) maybe.
+            // Actually we can just use the existing setup but ensure there is a PRISON tile that is not overwritten.
+            // I'll reset the police station area and build a clear prison cell.
+            // Let's overwrite the whole police station area with a clean design.
+            // We'll keep the outer walls, interior police tiles, and a prison cell with a door.
+
+            // Clear the area first (reset to road)
+            for (let r = psR - 1; r < psR + 4; r++) {
+                for (let c = psC - 1; c < psC + 4; c++) {
+                    if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
+                        map[r][c] = T.ROAD; // base
+                    }
+                }
+            }
+
+            // Outer walls
+            for (let r = psR - 1; r < psR + 4; r++) {
+                for (let c = psC - 1; c < psC + 4; c++) {
+                    if (r < ROWS && c < COLS) {
+                        if (r === psR - 1 || r === psR + 3 || c === psC - 1 || c === psC + 3) {
+                            map[r][c] = T.WALL;
+                        }
+                    }
+                }
+            }
+
+            // Interior: police station floor (POLICE tiles)
+            for (let r = psR; r < psR + 3; r++) {
+                for (let c = psC; c < psC + 3; c++) {
+                    if (r < ROWS && c < COLS) {
+                        if (!(r === psR && c === psC)) { // exclude the cell
                             map[r][c] = T.POLICE;
                         }
                     }
                 }
             }
-            // gate opening in police station wall (bottom)
-            for (let c = psC + 2; c < psC + psW - 2; c++) {
-                if (psR + psH - 1 < ROWS) {
-                    map[psR + psH - 1][c] = T.ROAD;
-                }
-            }
-            // prison cell inside police station (top-left corner of interior)
-            for (let r = psR + 1; r < psR + 4; r++) {
-                for (let c = psC + 1; c < psC + 4; c++) {
-                    if (r < ROWS && c < COLS) {
-                        map[r][c] = T.PRISON;
-                    }
-                }
-            }
-            // prison walls (bars)
-            for (let r = psR + 1; r < psR + 4; r++) {
-                map[r][psC + 1] = T.WALL;
-                map[r][psC + 3] = T.WALL;
-            }
-            for (let c = psC + 1; c < psC + 4; c++) {
-                map[psR + 1][c] = T.WALL;
-                map[psR + 3][c] = T.WALL;
-            }
-            // prison door (opening)
-            map[psR + 2][psC + 2] = T.ROAD;
+
+            // Prison cell: at (psR, psC) = PRISON
+            map[psR][psC] = T.PRISON;
+
+            // Walls around the cell (except door at bottom)
+            // Top wall: (psR-1, psC) is already outer wall, fine.
+            // Left wall: (psR, psC-1) is outer wall.
+            // Right wall: (psR, psC+1) is interior police, we want to make it a wall
+            map[psR][psC + 1] = T.WALL;
+            // Bottom wall: (psR+1, psC) we want to be a door -> ROAD
+            map[psR + 1][psC] = T.ROAD; // door
+            // Also make (psR+1, psC) not police, but road.
+
+            // Also ensure the cell's left and right are walls, but left is already outer, right we set.
+            // We also need to make sure the cell's top is wall (outer) and bottom is door.
+
+            // Now the cell is at (2,30) with walls on top, left, right and door at bottom (3,30).
+            // The player will spawn at (2,30) which is PRISON.
 
             // ── Escape zone (bottom-left) ──
             for (let r = ROWS - 5; r < ROWS - 2; r++) {
@@ -326,14 +376,12 @@
                 [23, 12, 3, 4],
                 [23, 18, 3, 4],
                 [23, 24, 3, 4],
-                // extra buildings on the right
                 [3, 34, 3, 4],
                 [7, 34, 3, 4],
                 [11, 34, 3, 4],
                 [15, 34, 3, 4],
                 [19, 34, 3, 4],
                 [23, 34, 3, 4],
-                // bottom buildings
                 [24, 10, 3, 4],
                 [24, 16, 3, 4],
                 [24, 22, 3, 4],
@@ -378,6 +426,7 @@
                     }
                 }
             }
+            // fallback
             return { x: 200, y: 200 };
         }
 
@@ -671,6 +720,7 @@
 
         // ─── Reset game ──────────────────────────────
         function resetGame() {
+            map = buildMap(); // rebuild map to reset prison
             const s = findStart();
             player.x = s.x;
             player.y = s.y;
@@ -690,8 +740,6 @@
             policeSpawnTimer = 0;
             statusMsg.textContent = '🚗 Break out of prison!';
             statusMsg.style.color = '#ffd93d';
-            // reset map
-            map = buildMap();
             // spawn initial police
             for (let i = 0; i < 2; i++) {
                 setTimeout(() => spawnPolice(), i * 300);
@@ -762,15 +810,15 @@
             const row = Math.floor(player.y / TILE);
             if (row >= 0 && row < ROWS && col >= 0 && col < COLS) {
                 const tile = map[row][col];
+                // If player is on a ROAD tile and still in prison, and has moved away from the cell
                 if (tile === T.ROAD && player.inPrison) {
-                    // check if far enough from prison
-                    const psR = 2,
-                        psC = 30;
+                    // check if far enough from prison cell (the PRISON tile)
+                    const prisonTile = findStart();
                     const distFromPrison = Math.sqrt(
-                        Math.pow(player.x - (psC * TILE + TILE * 4), 2) +
-                        Math.pow(player.y - (psR * TILE + TILE * 2), 2)
+                        Math.pow(player.x - prisonTile.x, 2) +
+                        Math.pow(player.y - prisonTile.y, 2)
                     );
-                    if (distFromPrison > 100) {
+                    if (distFromPrison > 40) { // moved out of the cell
                         player.inPrison = false;
                         player.escaped = true;
                         statusMsg.textContent = '🚨 You escaped! Now evade the police!';
@@ -986,7 +1034,7 @@
             ctx.font = '11px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'bottom';
-            const psCX = 30 * TILE + TILE * 4;
+            const psCX = 30 * TILE + TILE * 1.5;
             const psCY = 2 * TILE + TILE * 0.5;
             ctx.fillText('🚔 POLICE STATION', psCX, psCY - 4);
 
@@ -1131,18 +1179,18 @@
                 ctx.fillText('🔒 ESCAPE THE PRISON!', W / 2, 20);
                 ctx.shadowBlur = 0;
                 // arrow to gate
-                const gateX = 30 * TILE + TILE * 3.5;
-                const gateY = (2 + 6 - 1) * TILE;
+                const gateX = 30 * TILE + TILE * 1.5;
+                const gateY = (2 + 1) * TILE; // door at row 3
                 const blink = Math.sin(frameCount * 0.06) > 0;
                 if (blink) {
                     ctx.fillStyle = 'rgba(255,215,0,0.6)';
                     ctx.font = '28px sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText('⬇', gateX, gateY - 20);
+                    ctx.fillText('⬇', gateX, gateY + 10);
                     ctx.fillStyle = 'rgba(255,215,0,0.3)';
                     ctx.font = '14px sans-serif';
-                    ctx.fillText('EXIT', gateX, gateY + 10);
+                    ctx.fillText('EXIT', gateX, gateY + 40);
                 }
             }
         }
@@ -1187,6 +1235,5 @@
         console.log('🚓 Prison Break started! Drive with WASD / Arrow keys.');
         console.log('🏁 Escape the prison, then reach the EXIT zone!');
     </script>
-
 </body>
 </html>

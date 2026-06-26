@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>City Racer - 3D First Person</title>
+    <title>City Racer - Optimized</title>
     <style>
-        /* ─── Reset & Fullscreen ─── */
         * {
             margin: 0;
             padding: 0;
@@ -21,42 +20,40 @@
         canvas {
             display: block;
         }
-
-        /* ─── HUD ─── */
         #hud {
             position: fixed;
             bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 50px;
+            gap: 40px;
             align-items: center;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(6px);
-            padding: 14px 36px;
+            padding: 12px 28px;
             border-radius: 60px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             pointer-events: none;
             z-index: 10;
             color: #fff;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             letter-spacing: 0.5px;
         }
         #hud .stat {
             display: flex;
             align-items: baseline;
-            gap: 8px;
+            gap: 6px;
         }
         #hud .stat .label {
             font-weight: 400;
             opacity: 0.5;
-            font-size: 13px;
+            font-size: 12px;
             text-transform: uppercase;
         }
         #hud .stat .value {
-            font-size: 22px;
-            min-width: 60px;
+            font-size: 20px;
+            min-width: 50px;
             text-align: center;
         }
         #hud .stat .value.speed {
@@ -73,7 +70,6 @@
             text-shadow: 0 0 20px #ff6f00, 0 0 40px #ff6f00;
             animation: pulse 0.3s ease-in-out infinite alternate;
         }
-
         @keyframes pulse {
             0% {
                 transform: scale(1);
@@ -82,8 +78,6 @@
                 transform: scale(1.15);
             }
         }
-
-        /* ─── Crosshair ─── */
         #crosshair {
             position: fixed;
             top: 50%;
@@ -111,40 +105,36 @@
             top: -1px;
             left: -9px;
         }
-
-        /* ─── Instructions ─── */
         #instructions {
             position: fixed;
-            bottom: 120px;
+            bottom: 110px;
             left: 50%;
             transform: translateX(-50%);
             color: rgba(255, 255, 255, 0.35);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 400;
             letter-spacing: 1px;
             text-align: center;
             pointer-events: none;
             z-index: 5;
             background: rgba(0, 0, 0, 0.3);
-            padding: 8px 20px;
+            padding: 6px 16px;
             border-radius: 30px;
             backdrop-filter: blur(4px);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
         #instructions span {
             display: inline-block;
-            margin: 0 10px;
+            margin: 0 8px;
         }
         #instructions .key {
             color: #fff;
             font-weight: 600;
             background: rgba(255, 255, 255, 0.08);
-            padding: 2px 10px;
+            padding: 2px 8px;
             border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        /* ─── Ramp Indicator ─── */
         #ramp-indicator {
             position: fixed;
             top: 50%;
@@ -152,7 +142,7 @@
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 4;
-            font-size: 44px;
+            font-size: 40px;
             font-weight: 800;
             color: #ffab00;
             text-shadow: 0 0 30px rgba(255, 171, 0, 0.6);
@@ -171,30 +161,29 @@
                 transform: translate(-50%, -50%) scale(1.1);
             }
         }
-
         @media (max-width: 700px) {
             #hud {
                 bottom: 20px;
-                padding: 10px 18px;
-                gap: 20px;
-                font-size: 14px;
+                padding: 8px 14px;
+                gap: 16px;
+                font-size: 13px;
                 flex-wrap: wrap;
                 justify-content: center;
                 border-radius: 30px;
                 width: 92%;
             }
             #hud .stat .value {
-                font-size: 18px;
-                min-width: 40px;
+                font-size: 16px;
+                min-width: 35px;
             }
             #instructions {
-                bottom: 85px;
-                font-size: 11px;
-                padding: 6px 14px;
+                bottom: 80px;
+                font-size: 10px;
+                padding: 4px 12px;
                 width: 92%;
             }
             #instructions span {
-                margin: 0 6px;
+                margin: 0 4px;
             }
             #crosshair {
                 display: none;
@@ -204,36 +193,19 @@
 </head>
 <body>
 
-    <!-- ─── HUD ─── -->
     <div id="hud">
-        <div class="stat">
-            <span class="label">Speed</span>
-            <span class="value speed" id="speedDisplay">0</span>
-        </div>
-        <div class="stat">
-            <span class="label">Distance</span>
-            <span class="value dist" id="distDisplay">0</span>
-        </div>
-        <div class="stat">
-            <span class="label">Turbo</span>
-            <span class="value turbo" id="turboDisplay">●</span>
-        </div>
+        <div class="stat"><span class="label">Speed</span><span class="value speed" id="speedDisplay">0</span></div>
+        <div class="stat"><span class="label">Dist</span><span class="value dist" id="distDisplay">0</span></div>
+        <div class="stat"><span class="label">Turbo</span><span class="value turbo" id="turboDisplay">●</span></div>
     </div>
-
-    <!-- ─── Crosshair ─── -->
     <div id="crosshair"></div>
-
-    <!-- ─── Ramp Indicator ─── -->
     <div id="ramp-indicator">⬆ JUMP</div>
-
-    <!-- ─── Instructions ─── -->
     <div id="instructions">
-        <span>🖱 <span class="key">Move</span> to steer</span>
-        <span>🖱 <span class="key">Left Click</span> = Turbo</span>
-        <span>🖱 <span class="key">Right Click</span> = Jump</span>
+        <span>🖱 <span class="key">Move</span> steer</span>
+        <span>🖱 <span class="key">Left Click</span> Turbo</span>
+        <span>🖱 <span class="key">Right Click</span> Jump</span>
     </div>
 
-    <!-- ─── Three.js ─── -->
     <script type="importmap">
         {
             "imports": {
@@ -243,108 +215,81 @@
     </script>
 
     <script type="module">
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  IMPORTS
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         import * as THREE from 'three';
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  DOM REFS
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ─── DOM refs ───────────────────────────────────────────────
         const speedDisplay = document.getElementById('speedDisplay');
         const distDisplay = document.getElementById('distDisplay');
         const turboDisplay = document.getElementById('turboDisplay');
         const rampIndicator = document.getElementById('ramp-indicator');
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  THREE.JS SETUP
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ─── Scene setup ──────────────────────────────────────────
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0e1a);
-        scene.fog = new THREE.Fog(0x0a0e1a, 40, 120);
+        scene.fog = new THREE.Fog(0x0a0e1a, 40, 100);
 
-        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 200);
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 150);
         camera.position.set(0, 2.0, 0);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // performance
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.shadowMap.bias = 0.0001;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.0;
         document.body.prepend(renderer.domElement);
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  LIGHTS
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        const ambientLight = new THREE.AmbientLight(0x223355, 0.3);
-        scene.add(ambientLight);
+        // ─── Lights ────────────────────────────────────────────────
+        const ambient = new THREE.AmbientLight(0x223355, 0.4);
+        scene.add(ambient);
 
-        // Moonlight (subtle)
-        const moonLight = new THREE.DirectionalLight(0x88aaff, 0.4);
-        moonLight.position.set(-20, 40, 30);
-        scene.add(moonLight);
+        const moon = new THREE.DirectionalLight(0x88aaff, 0.5);
+        moon.position.set(-20, 40, 30);
+        scene.add(moon);
 
-        // City glow from below
-        const glowLight = new THREE.PointLight(0xff6622, 0.5, 80);
-        glowLight.position.set(0, 5, 0);
-        scene.add(glowLight);
+        const glow = new THREE.PointLight(0xff6622, 0.6, 60);
+        glow.position.set(0, 8, 0);
+        scene.add(glow);
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  ROAD PATH GENERATION (more turns)
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        function generatePathPoints() {
+        // ─── Road path (more turns) ──────────────────────────────
+        function generatePath() {
             const pts = [];
-            const totalPoints = 300;
-            const length = 120;
-            const turns = 6; // number of major turns
-
-            for (let i = 0; i <= totalPoints; i++) {
-                const t = i / totalPoints;
+            const total = 250;
+            const length = 100;
+            const turns = 6;
+            for (let i = 0; i <= total; i++) {
+                const t = i / total;
                 const angle = t * Math.PI * 2 * turns;
-
-                // Use combination of sin/cos for winding road
-                const x = 12 * Math.sin(angle * 1.3 + 0.5) + 4 * Math.sin(angle * 2.7 + 1.2);
-                const z = t * length - 20;
-
-                // Height with ramps
+                const x = 10 * Math.sin(angle * 1.3 + 0.5) + 3 * Math.sin(angle * 2.7 + 1.2);
+                const z = t * length - 15;
                 let y = 0;
-                // Ramps at specific intervals
-                const rampPositions = [0.15, 0.35, 0.55, 0.75, 0.92];
-                const rampHeight = 3.5;
-                for (const rp of rampPositions) {
-                    const dist = Math.abs(t - rp);
-                    if (dist < 0.06) {
-                        const p = (dist / 0.06);
-                        const h = rampHeight * Math.sin(p * Math.PI);
-                        y = Math.max(y, h);
+                const ramps = [0.15, 0.35, 0.55, 0.75, 0.92];
+                for (const rp of ramps) {
+                    const d = Math.abs(t - rp);
+                    if (d < 0.06) {
+                        const p = d / 0.06;
+                        y = Math.max(y, 3.5 * Math.sin(p * Math.PI));
                     }
                 }
-
-                // Add some bumps
-                y += 0.3 * Math.sin(t * 20);
-
+                y += 0.2 * Math.sin(t * 20);
                 pts.push(new THREE.Vector3(x, y, z));
             }
             return pts;
         }
-
-        const pathPoints = generatePathPoints();
+        const pathPoints = generatePath();
         const curve = new THREE.CatmullRomCurve3(pathPoints);
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  BUILD ROAD (dark asphalt)
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         const ROAD_WIDTH = 5.5;
-        const ROAD_SEGMENTS = 600;
+        const ROAD_SEGMENTS = 300; // reduced
 
+        // ─── Build road ────────────────────────────────────────────
         function buildRoad() {
-            const positions = [];
-            const normals = [];
-            const uvs = [];
-            const indices = [];
-
+            const positions = [],
+                normals = [],
+                uvs = [],
+                indices = [];
             for (let i = 0; i <= ROAD_SEGMENTS; i++) {
                 const t = i / ROAD_SEGMENTS;
                 const pt = curve.getPointAt(t);
@@ -352,123 +297,86 @@
                 const up = new THREE.Vector3(0, 1, 0);
                 const bin = new THREE.Vector3().crossVectors(tan, up).normalize();
                 if (bin.length() < 0.001) {
-                    const altUp = new THREE.Vector3(1, 0, 0);
-                    bin.crossVectors(tan, altUp).normalize();
+                    const alt = new THREE.Vector3(1, 0, 0);
+                    bin.crossVectors(tan, alt).normalize();
                 }
                 const right = bin.clone().normalize();
-
-                const leftPt = pt.clone().add(right.clone().multiplyScalar(-ROAD_WIDTH / 2));
-                const rightPt = pt.clone().add(right.clone().multiplyScalar(ROAD_WIDTH / 2));
-
+                const l = pt.clone().add(right.clone().multiplyScalar(-ROAD_WIDTH / 2));
+                const r = pt.clone().add(right.clone().multiplyScalar(ROAD_WIDTH / 2));
                 const yOff = 0.05;
-                positions.push(leftPt.x, leftPt.y + yOff, leftPt.z);
-                positions.push(rightPt.x, rightPt.y + yOff, rightPt.z);
-
-                const n = new THREE.Vector3(0, 1, 0);
-                normals.push(n.x, n.y, n.z);
-                normals.push(n.x, n.y, n.z);
-
-                uvs.push(0, t);
-                uvs.push(1, t);
-
+                positions.push(l.x, l.y + yOff, l.z, r.x, r.y + yOff, r.z);
+                normals.push(0, 1, 0, 0, 1, 0);
+                uvs.push(0, t, 1, t);
                 if (i < ROAD_SEGMENTS) {
-                    const base = i * 2;
-                    indices.push(base, base + 1, base + 2);
-                    indices.push(base + 1, base + 3, base + 2);
+                    const b = i * 2;
+                    indices.push(b, b + 1, b + 2, b + 1, b + 3, b + 2);
                 }
             }
-
             const geo = new THREE.BufferGeometry();
             geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
             geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
             geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
             geo.setIndex(indices);
             geo.computeVertexNormals();
-
-            const mat = new THREE.MeshStandardMaterial({
-                color: 0x1a1a2e,
-                roughness: 0.9,
-                metalness: 0.1,
-                side: THREE.DoubleSide,
-            });
+            const mat = new THREE.MeshStandardMaterial({ color: 0x1a1a2e, roughness: 0.9, metalness: 0.1, side: THREE.DoubleSide });
             const mesh = new THREE.Mesh(geo, mat);
             mesh.receiveShadow = true;
             mesh.castShadow = false;
             return mesh;
         }
+        scene.add(buildRoad());
 
-        const roadMesh = buildRoad();
-        scene.add(roadMesh);
-
-        // ─── Road markings (glowing dashes) ───
+        // ─── Road markings ─────────────────────────────────────────
         function buildMarkings() {
-            const positions = [];
-            const colors = [];
-            const segments = 400;
-            const dashLen = 0.8;
-            const gapLen = 0.5;
-            const halfW = 0.1;
-
-            for (let i = 0; i < segments; i++) {
-                const t = i / segments;
+            const positions = [],
+                colors = [];
+            const segs = 300;
+            const dash = 0.8,
+                gap = 0.5,
+                half = 0.1;
+            for (let i = 0; i < segs; i++) {
+                const t = i / segs;
                 const pt = curve.getPointAt(t);
                 const tan = curve.getTangentAt(t);
                 const up = new THREE.Vector3(0, 1, 0);
                 const bin = new THREE.Vector3().crossVectors(tan, up).normalize();
                 if (bin.length() < 0.001) {
-                    const altUp = new THREE.Vector3(1, 0, 0);
-                    bin.crossVectors(tan, altUp).normalize();
+                    const alt = new THREE.Vector3(1, 0, 0);
+                    bin.crossVectors(tan, alt).normalize();
                 }
                 const right = bin.clone().normalize();
-
-                const isDash = (i % Math.floor((dashLen + gapLen) / (1 / segments))) < Math.floor(dashLen / (1 / segments));
+                const isDash = (i % Math.floor((dash + gap) / (1 / segs))) < Math.floor(dash / (1 / segs));
                 if (!isDash) continue;
-
-                const c = pt.clone().add(right.clone().multiplyScalar(-halfW));
-                const d = pt.clone().add(right.clone().multiplyScalar(halfW));
+                const c = pt.clone().add(right.clone().multiplyScalar(-half));
+                const d = pt.clone().add(right.clone().multiplyScalar(half));
                 const yOff = 0.08;
-                positions.push(c.x, c.y + yOff, c.z);
-                positions.push(d.x, d.y + yOff, d.z);
-
-                const col = [0.9, 0.9, 0.9];
-                colors.push(col[0], col[1], col[2]);
-                colors.push(col[0], col[1], col[2]);
+                positions.push(c.x, c.y + yOff, c.z, d.x, d.y + yOff, d.z);
+                colors.push(0.9, 0.9, 0.9, 0.9, 0.9, 0.9);
             }
-
             const geo = new THREE.BufferGeometry();
             geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
             geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-            const mat = new THREE.LineBasicMaterial({
-                vertexColors: true,
-                linewidth: 1,
-                transparent: true,
-                opacity: 0.9,
-            });
-            const line = new THREE.LineSegments(geo, mat);
-            return line;
+            const mat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9 });
+            return new THREE.LineSegments(geo, mat);
         }
         scene.add(buildMarkings());
 
-        // ─── Road edges (glowing strips) ───
-        function buildEdgeStrips() {
+        // ─── Road edge strips ──────────────────────────────────────
+        function buildEdges() {
             const group = new THREE.Group();
-            const sides = [
-                { sign: -1, color: 0xff5533 },
-                { sign: 1, color: 0x33ccff },
-            ];
-            const segments = 500;
+            const sides = [{ sign: -1, color: 0xff5533 }, { sign: 1, color: 0x33ccff }];
+            const segs = 400;
             for (const side of sides) {
                 const pts = [];
-                for (let i = 0; i <= segments; i++) {
-                    const t = i / segments;
+                for (let i = 0; i <= segs; i++) {
+                    const t = i / segs;
                     const pt = curve.getPointAt(t);
                     const tan = curve.getTangentAt(t);
                     const up = new THREE.Vector3(0, 1, 0);
                     const bin = new THREE.Vector3().crossVectors(tan, up).normalize();
                     if (bin.length() < 0.001) {
-                        const altUp = new THREE.Vector3(1, 0, 0);
-                        bin.crossVectors(tan, altUp).normalize();
+                        const alt = new THREE.Vector3(1, 0, 0);
+                        bin.crossVectors(tan, alt).normalize();
                     }
                     const right = bin.clone().normalize();
                     const p = pt.clone().add(right.clone().multiplyScalar(side.sign * ROAD_WIDTH / 2));
@@ -476,80 +384,66 @@
                     pts.push(p);
                 }
                 const geo = new THREE.BufferGeometry().setFromPoints(pts);
-                const mat = new THREE.LineBasicMaterial({
-                    color: side.color,
-                    transparent: true,
-                    opacity: 0.4,
-                });
-                const line = new THREE.Line(geo, mat);
-                group.add(line);
+                const mat = new THREE.LineBasicMaterial({ color: side.color, transparent: true, opacity: 0.35 });
+                group.add(new THREE.Line(geo, mat));
             }
             return group;
         }
-        scene.add(buildEdgeStrips());
+        scene.add(buildEdges());
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  CITY BUILDINGS
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        function createBuilding(x, z, width, depth, height, color, emissiveColor) {
+        // ─── City buildings (optimized) ───────────────────────────
+        function createBuilding(x, z, w, d, h, color, emissive) {
             const group = new THREE.Group();
-            const geo = new THREE.BoxGeometry(width, height, depth);
-            const mat = new THREE.MeshStandardMaterial({
-                color: color,
-                roughness: 0.6,
-                metalness: 0.1,
-            });
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.position.y = height / 2;
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
+            const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.6, metalness: 0.1 });
+            const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+            mesh.position.y = h / 2;
+            mesh.castShadow = false;
+            mesh.receiveShadow = false;
             group.add(mesh);
 
-            // Windows (emissive boxes)
+            // Fewer windows: 4x4 grid, lower probability
             const winMat = new THREE.MeshStandardMaterial({
-                color: emissiveColor,
-                emissive: emissiveColor,
-                emissiveIntensity: 0.8,
+                color: emissive,
+                emissive: emissive,
+                emissiveIntensity: 0.7,
                 roughness: 0.2,
             });
-            const winCount = 6;
-            const spacingX = width / (winCount + 1);
-            const spacingY = height / (winCount + 1);
-            for (let i = 0; i < winCount; i++) {
-                for (let j = 0; j < winCount; j++) {
-                    if (Math.random() > 0.4) continue; // some windows off
-                    const w = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 0.25), winMat);
-                    const xPos = -width / 2 + spacingX * (i + 1);
+            const grid = 4;
+            const spacingX = w / (grid + 1);
+            const spacingY = h / (grid + 1);
+            for (let i = 0; i < grid; i++) {
+                for (let j = 0; j < grid; j++) {
+                    if (Math.random() > 0.5) continue;
+                    const win = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 0.2), winMat);
+                    const xPos = -w / 2 + spacingX * (i + 1);
                     const yPos = spacingY * (j + 1);
-                    // Place on front face
-                    w.position.set(xPos, yPos, depth / 2 + 0.01);
-                    group.add(w);
-                    // Back face
-                    const w2 = w.clone();
-                    w2.position.set(xPos, yPos, -depth / 2 - 0.01);
-                    w2.rotation.y = Math.PI;
-                    group.add(w2);
-                    // Side faces
+                    // front
+                    const f = win.clone();
+                    f.position.set(xPos, yPos, d / 2 + 0.01);
+                    group.add(f);
+                    // back
+                    const b = win.clone();
+                    b.position.set(xPos, yPos, -d / 2 - 0.01);
+                    b.rotation.y = Math.PI;
+                    group.add(b);
+                    // sides (only some)
                     if (i % 2 === 0) {
-                        const w3 = w.clone();
-                        w3.position.set(width / 2 + 0.01, yPos, -depth / 2 + spacingX * (i + 1));
-                        w3.rotation.y = Math.PI / 2;
-                        group.add(w3);
-                        const w4 = w.clone();
-                        w4.position.set(-width / 2 - 0.01, yPos, -depth / 2 + spacingX * (i + 1));
-                        w4.rotation.y = -Math.PI / 2;
-                        group.add(w4);
+                        const s1 = win.clone();
+                        s1.position.set(w / 2 + 0.01, yPos, -d / 2 + spacingX * (i + 1));
+                        s1.rotation.y = Math.PI / 2;
+                        group.add(s1);
+                        const s2 = win.clone();
+                        s2.position.set(-w / 2 - 0.01, yPos, -d / 2 + spacingX * (i + 1));
+                        s2.rotation.y = -Math.PI / 2;
+                        group.add(s2);
                     }
                 }
             }
-
             group.position.set(x, 0, z);
             return group;
         }
 
-        // Generate buildings along the road
-        const buildingPositions = [];
-        const buildingCount = 200;
+        const buildingCount = 80; // reduced from 200
         for (let i = 0; i < buildingCount; i++) {
             const t = Math.random();
             const pt = curve.getPointAt(t);
@@ -557,98 +451,78 @@
             const up = new THREE.Vector3(0, 1, 0);
             const bin = new THREE.Vector3().crossVectors(tan, up).normalize();
             if (bin.length() < 0.001) {
-                const altUp = new THREE.Vector3(1, 0, 0);
-                bin.crossVectors(tan, altUp).normalize();
+                const alt = new THREE.Vector3(1, 0, 0);
+                bin.crossVectors(tan, alt).normalize();
             }
             const right = bin.clone().normalize();
             const side = Math.random() > 0.5 ? 1 : -1;
-            const dist = ROAD_WIDTH / 2 + 1.5 + Math.random() * 4.5;
+            const dist = ROAD_WIDTH / 2 + 1.5 + Math.random() * 4;
             const x = pt.x + right.x * side * dist + (Math.random() - 0.5) * 1.0;
             const z = pt.z + right.z * side * dist + (Math.random() - 0.5) * 1.0;
-            const width = 0.8 + Math.random() * 1.2;
-            const depth = 0.8 + Math.random() * 1.2;
-            const height = 3 + Math.random() * 20;
-            const hue = 0.6 + Math.random() * 0.25; // blue-ish to purple
+            const w = 0.8 + Math.random() * 1.2;
+            const d = 0.8 + Math.random() * 1.2;
+            const h = 3 + Math.random() * 18;
+            const hue = 0.6 + Math.random() * 0.25;
             const color = new THREE.Color().setHSL(hue, 0.5, 0.3 + Math.random() * 0.2);
             const emissive = new THREE.Color().setHSL(hue, 0.8, 0.5 + Math.random() * 0.3);
-            buildingPositions.push({ x, z, width, depth, height, color, emissive });
+            scene.add(createBuilding(x, z, w, d, h, color, emissive));
         }
 
-        for (const b of buildingPositions) {
-            const building = createBuilding(b.x, b.z, b.width, b.depth, b.height, b.color, b.emissive);
-            scene.add(building);
-        }
-
-        // ─── Street lights ───
+        // ─── Street lights (optimized: no PointLight, only emissive) ──
         function createStreetLight(x, z) {
             const group = new THREE.Group();
             const poleMat = new THREE.MeshStandardMaterial({ color: 0x444455, metalness: 0.7, roughness: 0.3 });
             const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 2.8, 6), poleMat);
             pole.position.y = 1.4;
             group.add(pole);
-
             const armMat = new THREE.MeshStandardMaterial({ color: 0x555566, metalness: 0.6, roughness: 0.4 });
             const arm = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.04, 0.04), armMat);
             arm.position.set(0.2, 2.8, 0);
             group.add(arm);
-
-            // Light sphere
             const lightMat = new THREE.MeshStandardMaterial({
                 color: 0xffdd77,
                 emissive: 0xffaa33,
-                emissiveIntensity: 2,
+                emissiveIntensity: 1.5,
             });
             const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), lightMat);
             sphere.position.set(0.4, 2.75, 0);
             group.add(sphere);
-
-            // Point light
-            const pl = new THREE.PointLight(0xffaa44, 1.5, 12);
-            pl.position.set(0.4, 2.7, 0);
-            group.add(pl);
-
             group.position.set(x, 0, z);
             return group;
         }
 
-        // Place street lights along road
-        for (let i = 0; i < 120; i++) {
-            const t = i / 120;
+        const lightCount = 40; // reduced from 120
+        for (let i = 0; i < lightCount; i++) {
+            const t = i / lightCount;
             const pt = curve.getPointAt(t);
             const tan = curve.getTangentAt(t);
             const up = new THREE.Vector3(0, 1, 0);
             const bin = new THREE.Vector3().crossVectors(tan, up).normalize();
             if (bin.length() < 0.001) {
-                const altUp = new THREE.Vector3(1, 0, 0);
-                bin.crossVectors(tan, altUp).normalize();
+                const alt = new THREE.Vector3(1, 0, 0);
+                bin.crossVectors(tan, alt).normalize();
             }
             const right = bin.clone().normalize();
             const side = (i % 2 === 0) ? 1 : -1;
             const dist = ROAD_WIDTH / 2 + 0.6;
             const x = pt.x + right.x * side * dist;
             const z = pt.z + right.z * side * dist;
-            const light = createStreetLight(x, z);
-            scene.add(light);
+            scene.add(createStreetLight(x, z));
         }
 
-        // ─── Ground plane (dark) ───
+        // ─── Ground ────────────────────────────────────────────────
         const groundGeo = new THREE.PlaneGeometry(400, 200);
         groundGeo.rotateX(-Math.PI / 2);
-        const groundMat = new THREE.MeshStandardMaterial({
-            color: 0x0a0e1a,
-            roughness: 1,
-            metalness: 0,
-        });
+        const groundMat = new THREE.MeshStandardMaterial({ color: 0x0a0e1a, roughness: 1, metalness: 0 });
         const ground = new THREE.Mesh(groundGeo, groundMat);
         ground.position.set(0, -0.5, 30);
         ground.receiveShadow = true;
         scene.add(ground);
 
-        // ─── Skyline / distant buildings (glow) ───
-        // We'll add a few tall buildings far away as silhouettes
-        for (let i = 0; i < 30; i++) {
+        // ─── Distant buildings (silhouettes) ──────────────────────
+        for (let i = 0; i < 20; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const radius = 80 + Math.random() * 40;
+            const radius = 70 + Math.random() * 40;
             const x = Math.cos(angle) * radius;
             const z = Math.sin(angle) * radius + 20;
             const h = 15 + Math.random() * 30;
@@ -657,57 +531,42 @@
             const mat = new THREE.MeshStandardMaterial({
                 color: 0x111122,
                 emissive: 0x224466,
-                emissiveIntensity: 0.2,
+                emissiveIntensity: 0.15,
                 roughness: 0.8,
             });
             const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
             mesh.position.set(x, h / 2 - 2, z);
-            mesh.castShadow = false;
-            mesh.receiveShadow = false;
             scene.add(mesh);
         }
 
-        // ─── Stars (twinkling) ───
+        // ─── Stars ──────────────────────────────────────────────────
         const starsGeo = new THREE.BufferGeometry();
-        const starsCount = 1500;
+        const starsCount = 1000;
         const starPos = new Float32Array(starsCount * 3);
         for (let i = 0; i < starsCount * 3; i++) {
             starPos[i] = (Math.random() - 0.5) * 500;
             if (i % 3 === 1) starPos[i] = Math.random() * 100 + 20;
         }
         starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
-        const starsMat = new THREE.PointsMaterial({
-            color: 0xffffff,
-            size: 0.2,
-            transparent: true,
-            opacity: 0.7,
-        });
+        const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.2, transparent: true, opacity: 0.7 });
         const stars = new THREE.Points(starsGeo, starsMat);
         scene.add(stars);
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  PLAYER CAR (first person)
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ─── Player car ─────────────────────────────────────────────
         const carGroup = new THREE.Group();
 
         // Hood
-        const hoodMat = new THREE.MeshStandardMaterial({
-            color: 0xcc2222,
-            roughness: 0.3,
-            metalness: 0.7,
-        });
+        const hoodMat = new THREE.MeshStandardMaterial({ color: 0xcc2222, roughness: 0.3, metalness: 0.7 });
         const hood = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.15, 1.0), hoodMat);
         hood.position.set(0, -0.3, 0.5);
         hood.castShadow = true;
         carGroup.add(hood);
 
-        // Hood scoop
         const scoopMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.4, metalness: 0.3 });
         const scoop = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.12, 0.3), scoopMat);
         scoop.position.set(0, -0.15, 0.55);
         carGroup.add(scoop);
 
-        // Windshield
         const glassMat = new THREE.MeshStandardMaterial({
             color: 0x88ccff,
             roughness: 0.05,
@@ -719,7 +578,6 @@
         glass.position.set(0, 0.2, -0.45);
         carGroup.add(glass);
 
-        // Dashboard
         const dashMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.8 });
         const dash = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.08, 0.3), dashMat);
         dash.position.set(0, 0.02, -0.15);
@@ -731,13 +589,11 @@
         const rim = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.025, 8, 16), rimMat);
         rim.rotation.x = Math.PI / 2;
         wheelGroup.add(rim);
-
         const hubMat = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.3, metalness: 0.5 });
         const hub = new THREE.Mesh(new THREE.CircleGeometry(0.05, 8), hubMat);
         hub.rotation.x = -Math.PI / 2;
         hub.position.z = 0.01;
         wheelGroup.add(hub);
-
         for (let i = 0; i < 3; i++) {
             const spokeMat = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.4, roughness: 0.3 });
             const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.1, 0.01), spokeMat);
@@ -747,7 +603,6 @@
         wheelGroup.position.set(0, -0.12, -0.2);
         carGroup.add(wheelGroup);
 
-        // Side mirrors
         const mirrorMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.2, metalness: 0.6 });
         for (const side of [-1, 1]) {
             const mirror = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.12), mirrorMat);
@@ -755,7 +610,6 @@
             carGroup.add(mirror);
         }
 
-        // Headlights
         const hlMat = new THREE.MeshStandardMaterial({
             color: 0xffffee,
             emissive: 0xffffaa,
@@ -768,7 +622,6 @@
             carGroup.add(hl);
         }
 
-        // Shadow disc
         const shadowMat = new THREE.MeshStandardMaterial({
             color: 0x000000,
             transparent: true,
@@ -788,9 +641,7 @@
         carGroup.position.y += 0.1;
         scene.add(carGroup);
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  GAME STATE
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ─── Game state ─────────────────────────────────────────────
         const state = {
             t: 0,
             steer: 0,
@@ -809,13 +660,9 @@
             distance: 0,
             mouseX: 0,
             mouseY: 0,
-            leftPressed: false,
-            rightPressed: false,
         };
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  CONTROLS
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ─── Controls ──────────────────────────────────────────────
         document.addEventListener('mousemove', (e) => {
             const x = (e.clientX / window.innerWidth) * 2 - 1;
             state.mouseX = Math.max(-1, Math.min(1, x));
@@ -823,26 +670,13 @@
         });
 
         document.addEventListener('mousedown', (e) => {
-            if (e.button === 0) {
-                e.preventDefault();
-                state.leftPressed = true;
-                activateTurbo();
-            }
-            if (e.button === 2) {
-                e.preventDefault();
-                state.rightPressed = true;
-                activateJump();
-            }
+            if (e.button === 0) { e.preventDefault();
+                activateTurbo(); }
+            if (e.button === 2) { e.preventDefault();
+                activateJump(); }
         });
-
-        document.addEventListener('mouseup', (e) => {
-            if (e.button === 0) state.leftPressed = false;
-            if (e.button === 2) state.rightPressed = false;
-        });
-
         document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-        // Touch
         let touchId = null;
         renderer.domElement.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -855,7 +689,6 @@
                 activateTurbo();
             }
         }, { passive: false });
-
         renderer.domElement.addEventListener('touchmove', (e) => {
             e.preventDefault();
             for (const touch of e.changedTouches) {
@@ -867,13 +700,9 @@
                 }
             }
         }, { passive: false });
+        renderer.domElement.addEventListener('touchend', (e) => { e.preventDefault();
+            touchId = null; }, { passive: false });
 
-        renderer.domElement.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            touchId = null;
-        }, { passive: false });
-
-        // ─── Turbo ───
         function activateTurbo() {
             if (state.turboCooldown > 0) return;
             state.turboActive = true;
@@ -883,7 +712,6 @@
             turboDisplay.classList.add('active');
         }
 
-        // ─── Jump ───
         function activateJump() {
             if (!state.onRamp || !state.isGrounded) return;
             state.jumpActive = true;
@@ -892,25 +720,20 @@
             rampIndicator.classList.remove('show');
         }
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  HELPER
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ─── Helpers ────────────────────────────────────────────────
         function getRoadData(t) {
             const pt = curve.getPointAt(t);
             const tan = curve.getTangentAt(t);
             const up = new THREE.Vector3(0, 1, 0);
             const bin = new THREE.Vector3().crossVectors(tan, up).normalize();
             if (bin.length() < 0.001) {
-                const altUp = new THREE.Vector3(1, 0, 0);
-                bin.crossVectors(tan, altUp).normalize();
+                const alt = new THREE.Vector3(1, 0, 0);
+                bin.crossVectors(tan, alt).normalize();
             }
             const right = bin.clone().normalize();
-            return { pt, tan, right, up };
+            return { pt, tan, right };
         }
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  RAMP DETECTION
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         function checkRamp(t) {
             const eps = 0.003;
             const t1 = Math.max(0, t - eps);
@@ -924,15 +747,13 @@
             return height > 0.8 || slope > 0.1;
         }
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  GAME LOOP
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ─── Game loop ──────────────────────────────────────────────
         const clock = new THREE.Clock();
 
         function update() {
             const delta = Math.min(clock.getDelta(), 0.05);
 
-            // ── Turbo ──
+            // Turbo
             if (state.turboActive) {
                 state.turboTimer -= delta;
                 if (state.turboTimer <= 0) {
@@ -943,26 +764,24 @@
             }
             if (state.turboCooldown > 0) state.turboCooldown -= delta;
 
-            // ── Speed ──
+            // Speed
             const steerFactor = 1 - Math.abs(state.steer) * 0.3;
             let targetSpeed = state.baseSpeed * steerFactor;
             if (state.turboActive) targetSpeed = Math.min(state.maxSpeed + 5, targetSpeed + 9);
             state.speed += (targetSpeed - state.speed) * delta * 2.8;
             state.speed = Math.max(state.minSpeed, Math.min(state.maxSpeed + 5, state.speed));
 
-            // ── Steer ──
-            const steerSpeed = 3.5;
-            const targetSteer = state.mouseX;
-            state.steer += (targetSteer - state.steer) * delta * steerSpeed;
+            // Steer
+            state.steer += (state.mouseX - state.steer) * delta * 3.5;
             state.steer = Math.max(-1, Math.min(1, state.steer));
 
-            // ── Move along path ──
+            // Move along path
             const speedFactor = state.speed / 12;
             const dt = delta * 0.07 * speedFactor;
             state.t += dt;
             if (state.t > 1) state.t -= 1;
 
-            // ── Ramp detection ──
+            // Ramp detection
             state.onRamp = checkRamp(state.t);
             if (state.onRamp && state.isGrounded) {
                 rampIndicator.classList.add('show');
@@ -970,7 +789,7 @@
                 if (!state.jumpActive) rampIndicator.classList.remove('show');
             }
 
-            // ── Jump physics ──
+            // Jump physics
             if (state.jumpActive) {
                 state.jumpVelocity += state.jumpGravity * delta;
                 const roadHeight = curve.getPointAt(state.t).y;
@@ -990,58 +809,50 @@
                 state.isGrounded = true;
             }
 
-            // ── Road data ──
+            // Road data
             const data = getRoadData(state.t);
             const { pt, tan, right } = data;
 
-            // ── Lateral offset ──
+            // Lateral offset
             const maxOffset = ROAD_WIDTH / 2 - 0.5;
             const offset = state.steer * maxOffset;
             const lateralPos = pt.clone().add(right.clone().multiplyScalar(offset));
-
             carGroup.position.x = lateralPos.x;
             carGroup.position.z = lateralPos.z;
 
-            // ── Car rotation (forward = tangent) ──
-            // We want car's local -Z to point along tangent
-            const targetAngle = Math.atan2(tan.x, -tan.z);
+            // Car rotation (forward = +Z aligns with tangent)
+            const targetAngle = Math.atan2(tan.x, tan.z);
             let currentAngle = carGroup.rotation.y;
             let diff = targetAngle - currentAngle;
             while (diff > Math.PI) diff -= Math.PI * 2;
             while (diff < -Math.PI) diff += Math.PI * 2;
             carGroup.rotation.y += diff * delta * 4;
 
-            // ── Roll ──
+            // Roll
             const rollAmount = -state.steer * 0.07;
             carGroup.rotation.z += (rollAmount - carGroup.rotation.z) * delta * 3;
 
-            // ── Pitch ──
+            // Pitch
             const pitchTarget = Math.atan2(pt.y - curve.getPointAt(Math.max(0, state.t - 0.01)).y, 0.5);
             carGroup.rotation.x += (pitchTarget * 0.3 - carGroup.rotation.x) * delta * 2;
 
-            // ── Distance ──
+            // Distance
             state.distance += state.speed * delta * 0.6;
 
-            // ── Camera ──
+            // Camera
             const eyeHeight = 1.4;
             const camPos = carGroup.position.clone();
             camPos.y += eyeHeight;
-            const bobAmount = state.speed > 2 ? 0.015 * Math.sin(state.distance * 0.08) : 0;
-            camPos.y += bobAmount;
-
-            // Look ahead along tangent
+            camPos.y += state.speed > 2 ? 0.015 * Math.sin(state.distance * 0.08) : 0;
             const lookAhead = 10;
             const targetPos = carGroup.position.clone().add(tan.clone().multiplyScalar(lookAhead));
             targetPos.y += 0.2 + state.mouseY * 0.3;
-
             camera.position.copy(camPos);
             camera.lookAt(targetPos);
 
-            // ── HUD ──
-            const speedKmh = Math.round(state.speed * 8);
-            speedDisplay.textContent = speedKmh;
+            // HUD
+            speedDisplay.textContent = Math.round(state.speed * 8);
             distDisplay.textContent = Math.floor(state.distance);
-
             if (state.turboActive) {
                 turboDisplay.textContent = '⚡';
             } else if (state.turboCooldown > 0) {
@@ -1052,48 +863,35 @@
                 turboDisplay.style.opacity = '1';
             }
 
-            // ── Stars rotation ──
             stars.rotation.y += delta * 0.005;
         }
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  RESIZE
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ─── Resize ──────────────────────────────────────────────────
         window.addEventListener('resize', () => {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            camera.aspect = w / h;
+            camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
-            renderer.setSize(w, h);
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  ANIMATION LOOP
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ─── Animation loop ─────────────────────────────────────────
         function animate() {
             requestAnimationFrame(animate);
             update();
             renderer.render(scene, camera);
         }
-
         animate();
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        //  STARTUP
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ─── Startup ────────────────────────────────────────────────
         state.t = 0;
         state.distance = 0;
         state.speed = state.baseSpeed;
-        const startData = getRoadData(0);
-        carGroup.position.copy(startData.pt);
+        const sData = getRoadData(0);
+        carGroup.position.copy(sData.pt);
         carGroup.position.y += 0.1;
-        const startAngle = Math.atan2(startData.tan.x, -startData.tan.z);
-        carGroup.rotation.y = startAngle;
+        carGroup.rotation.y = Math.atan2(sData.tan.x, sData.tan.z);
 
-        console.log('🏙️ City Racer ready!');
-        console.log('🖱 Move mouse to steer');
-        console.log('🖱 Left click = Turbo');
-        console.log('🖱 Right click = Jump (on ramps)');
+        console.log('🏙️ City Racer (optimized) ready!');
+        console.log('🖱 Move mouse to steer | Left click = Turbo | Right click = Jump (on ramps)');
     </script>
 </body>
 </html>
